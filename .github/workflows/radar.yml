@@ -1,0 +1,63 @@
+name: Radar OPERA
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: write
+concurrency:
+  group: radar
+  cancel-in-progress: false
+env:
+  RADAR_PUBLIC_BASE_URL: https://ruchu85.github.io/meteonexo-radar
+  RADAR_DATA_DIR: ${{ github.workspace }}/data
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Tests del procesador
+        if: github.event_name != 'schedule'
+        run: python -m unittest discover -s tests -v
+      # Previous frames are reused so each run only downloads the new HDF5 composites.
+      - uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: radar-${{ github.run_id }}
+          restore-keys: radar-
+      - name: Procesar OPERA
+        run: python worker.py --history 120 --max-frames 13
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: data
+          key: radar-${{ github.run_id }}-${{ github.run_attempt }}
+      - run: python scripts/build_site.py data site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
+      # GitHub disables cron workflows in public repos after 60 days without activity.
+      - name: Mantener el cron activo
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(date -u +%d%H)" = "0100" ]; then
+            gh api -X PUT "repos/${{ github.repository }}/actions/workflows/radar.yml/enable"
+          fi

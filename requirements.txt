@@ -1,0 +1,6 @@
+# Processing dependencies only; never imported by the Node/Vercel web process.
+numpy>=1.26,<3
+h5py>=3.11,<4
+rasterio>=1.3.10,<2
+Pillow>=10.4,<13
+requests>=2.32,<3
