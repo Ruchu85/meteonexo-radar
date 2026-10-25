@@ -1,0 +1,28 @@
+name: Validar procesador (sin publicar)
+on:
+  push:
+    branches-ignore: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RADAR_PUBLIC_BASE_URL: https://ruchu85.github.io/meteonexo-radar
+      RADAR_DATA_DIR: ${{ github.workspace }}/data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python worker.py --history 60 --max-frames 7
+      - run: python scripts/build_site.py data site
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site
+          retention-days: 2
