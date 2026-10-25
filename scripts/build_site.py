@@ -11,10 +11,9 @@ from pathlib import Path
 data, site = Path(sys.argv[1]), Path(sys.argv[2])
 manifest = json.loads((data / 'manifest.json').read_text())
 (site / 'frames').mkdir(parents=True, exist_ok=True)
-for frame in manifest['frames']:
-    for suffix in ('r', 'c'):
-        name = f"{frame['id']}-{suffix}.png"
-        shutil.copy2(data / 'frames' / name, site / 'frames' / name)
+# Observed frames reference {id}-r/-c.png; forecast frames {base}-f{lead}.png and the base coverage.
+for name in {Path(frame[key]).name for frame in manifest['frames'] for key in ('image', 'coverage')}:
+    shutil.copy2(data / 'frames' / name, site / 'frames' / name)
 for name in ('manifest.json', 'health.json'):
     if (data / name).exists():
         shutil.copy2(data / name, site / name)
@@ -25,4 +24,5 @@ for name in ('manifest.json', 'health.json'):
     'Fuente: <a href="https://eumetnet.github.io/openradardata-documentation/">EUMETNET OPERA</a>, '
     '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>'
 )
-print(f"Site ready: {len(manifest['frames'])} frames, latest {manifest['frames'][-1]['time']}")
+forecast = sum(f.get('kind') == 'forecast' for f in manifest['frames'])
+print(f"Site ready: {len(manifest['frames']) - forecast} observed + {forecast} forecast frames, last {manifest['frames'][-1]['time']}")

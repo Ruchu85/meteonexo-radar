@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""OPERA DBZH -> Web Mercator PNG sequence. No screenshot extraction or nowcasting.
+"""OPERA DBZH -> Web Mercator PNG sequence plus a 60-minute extrapolation nowcast.
 
 Source: EUMETNET Open Radar Data public 24h S3 cache (documented anonymous access).
 Output contract: version 1, DBZH, dBZ, EPSG:3857, fixed Iberia/Balearic extent.
 A failed cycle never replaces a valid published manifest with an empty sequence.
+Forecast frames are flagged kind=forecast and derived only by advecting observed echoes (pysteps).
 """
 from __future__ import annotations
 import argparse
@@ -149,7 +150,7 @@ def read_odim(filename):
         return {'dbz':dbz,'observed':observed.astype(np.uint8),'crs':crs,'transform':transform_src,
                 'time':observation,'nativeScale':[dx,dy],'width':width,'height':height}
 
-def render_composite(radar,width=1536):
+def reproject_grid(radar,width=1536):
     west,south,east,north=BOUNDS
     xx,yy=transform('EPSG:4326','EPSG:3857',[west,east],[south,north])
     height=round(width*(yy[1]-yy[0])/(xx[1]-xx[0]))
@@ -159,18 +160,27 @@ def render_composite(radar,width=1536):
     common=dict(src_transform=radar['transform'],src_crs=radar['crs'],dst_transform=dst_transform,dst_crs='EPSG:3857',resampling=Resampling.nearest,num_threads=2)
     reproject(radar['dbz'],target,src_nodata=np.nan,dst_nodata=np.nan,**common)
     reproject(radar['observed'],mask,src_nodata=0,dst_nodata=0,**common)
-    rgba=np.zeros((height,width,4),dtype=np.uint8)
+    return target,mask
+
+def colorize(target,mask,alpha=235):
+    rgba=np.zeros((*target.shape,4),dtype=np.uint8)
     colored=(mask==1)&np.isfinite(target)&(target>=STOPS[0])
     for channel in range(3):
         values=np.interp(np.nan_to_num(target,nan=-999),STOPS,COLORS[:,channel])
         rgba[:,:,channel]=np.where(colored,values,0).astype(np.uint8)
-    rgba[:,:,3]=np.where(colored,235,0)
+    rgba[:,:,3]=np.where(colored,alpha,0)
+    return rgba
+
+def render_composite(radar,width=1536):
+    target,mask=reproject_grid(radar,width)
+    height=target.shape[0]
+    rgba=colorize(target,mask)
     # A separate mask is essential: blank/no echo must NOT equal no coverage.
     no_data=np.zeros_like(rgba);rows,cols=np.indices((height,width))
     missing=mask==0;hatch=((rows+cols)%16)<3
     no_data[:,:,:3]=[89,105,108]
     no_data[:,:,3]=np.where(missing,np.where(hatch,105,35),0).astype(np.uint8)
-    return rgba,no_data,{'width':width,'height':height,'observedFraction':round(float(np.mean(mask==1)),5)}
+    return rgba,no_data,{'width':width,'height':height,'observedFraction':round(float(np.mean(mask==1)),5),'dbz':target,'mask':mask}
 
 def atomic_json(target,value):
     target.parent.mkdir(parents=True,exist_ok=True)
@@ -199,18 +209,78 @@ def make_frame(source_file,output,base,now=None):
     rgba,coverage,stats=render_composite(radar)
     atomic_png(output/'frames'/f'{fid}-r.png',rgba)
     atomic_png(output/'frames'/f'{fid}-c.png',coverage)
+    # The reprojected dBZ grid is kept (locally only) as nowcast input for later cycles.
+    save_grid(output/'frames'/f'{fid}.npz',stats['dbz'],stats['mask'])
     frame={'id':fid,'time':iso(radar['time']),'image':f'{base}/frames/{fid}-r.png',
            'coverage':f'{base}/frames/{fid}-c.png','observedFraction':stats['observedFraction'],
            'nativeScaleMeters':radar['nativeScale']}
     atomic_json(output/'frames'/f'{fid}.json',frame)
     return frame
 
+def save_grid(target,dbz,mask):
+    target.parent.mkdir(parents=True,exist_ok=True)
+    with tempfile.NamedTemporaryFile(suffix='.npz',dir=target.parent,delete=False) as fh:temp=Path(fh.name)
+    try:
+        np.savez_compressed(temp,dbz=dbz.astype(np.float16),mask=mask.astype(np.uint8));os.replace(temp,target)
+    finally:temp.unlink(missing_ok=True)
+
+def load_grid(path):
+    with np.load(path) as z:return z['dbz'].astype(np.float32),z['mask']
+
+NOWCAST_STEP=10
+NOWCAST_LEADS=6
+NOWCAST_FLOOR=0.0
+
+def extrapolate(grids,leads=NOWCAST_LEADS):
+    """Lucas-Kanade motion from equally spaced dBZ fields + semi-Lagrangian advection.
+
+    Pure extrapolation: echoes are moved, never created or intensified.
+    """
+    from pysteps import motion
+    from pysteps.extrapolation.semilagrangian import extrapolate as advect
+    fields=np.stack([np.where(np.isfinite(g)&(g>=STOPS[0]),g,NOWCAST_FLOOR) for g in grids]).astype(np.float64)
+    velocity=motion.get_method('LK')(fields,verbose=False)
+    out=advect(fields[-1],velocity,leads,outval=NOWCAST_FLOOR)
+    return np.where(np.isfinite(out),out,NOWCAST_FLOOR).astype(np.float32)
+
+def make_nowcast(output,base,latest,grids):
+    """Forecast frames +10..+60 min from `latest` (the newest observed frame)."""
+    lid=latest['id'];start=dt.datetime.strptime(lid,'%Y%m%dT%H%M%SZ').replace(tzinfo=UTC)
+    fields=extrapolate(grids)
+    mask=load_grid(output/'frames'/f'{lid}.npz')[1]
+    frames=[]
+    for i,field in enumerate(fields,1):
+        lead=i*NOWCAST_STEP;valid=start+dt.timedelta(minutes=lead)
+        atomic_png(output/'frames'/f'{lid}-f{lead}.png',colorize(field,mask,alpha=215))
+        frames.append({'id':valid.strftime('%Y%m%dT%H%M%SZ'),'time':iso(valid),'kind':'forecast','base':lid,'leadMinutes':lead,
+                       'image':f'{base}/frames/{lid}-f{lead}.png','coverage':f'{base}/frames/{lid}-c.png'})
+    return frames
+
+def nowcast_frames(output,base,latest,available,obtain):
+    """Nowcast inputs are the latest observation and the ones 10 and 20 minutes earlier.
+
+    Any failure (missing input, pysteps error) publishes observations only.
+    """
+    try:
+        start=dt.datetime.strptime(latest['id'],'%Y%m%dT%H%M%SZ').replace(tzinfo=UTC)
+        stamps=[start-dt.timedelta(minutes=NOWCAST_STEP*k) for k in (2,1,0)]
+        if any(t not in available for t in stamps):raise RuntimeError('Missing equally spaced nowcast inputs')
+        for t in stamps[:-1]:
+            if not obtain(t,available[t]):raise RuntimeError('Nowcast input unavailable')
+        grids=[load_grid(output/'frames'/f"{t.strftime('%Y%m%dT%H%M%SZ')}.npz")[0] for t in stamps]
+        frames=make_nowcast(output,base,latest,grids)
+        LOG.info('Nowcast from %s: %s forecast frames',latest['time'],len(frames))
+        return frames
+    except Exception as exc:
+        LOG.warning('Nowcast skipped (%s: %s); publishing observations only',type(exc).__name__,exc)
+        return []
+
 def make_manifest(frames,now=None):
     return {'version':1,'product':'DBZH','unit':'dBZ','projection':'EPSG:3857','bounds':list(BOUNDS),
             'generatedAt':iso(now or utcnow()),'source':'EUMETNET OPERA','license':'CC BY 4.0',
             'sourceUrl':'https://eumetnet.github.io/openradardata-documentation/',
             'licenseUrl':'https://creativecommons.org/licenses/by/4.0/',
-            'processing':'Nearest-neighbour reprojection, geographic crop and colour mapping by MeteoNexo; values below 5 dBZ not coloured. Not a forecast.',
+            'processing':'Nearest-neighbour reprojection, geographic crop and colour mapping by MeteoNexo; values below 5 dBZ not coloured. Frames with kind=forecast are a MeteoNexo extrapolation nowcast (pysteps Lucas-Kanade + semi-Lagrangian advection), not observations.',
             'frames':sorted(frames,key=lambda x:x['time'])}
 
 def publish(output,manifest,bucket,prefix='radar'):
@@ -243,31 +313,35 @@ def cycle(args,s):
     if args.input:
         frames=[make_frame(Path(args.input),out,base,now)]
     else:
-        items=select_frames(discover(s,now,args.history),args.max_frames,args.history)
+        available=discover(s,now,args.history)
+        items=select_frames(available,args.max_frames,args.history)
         if not items:raise RuntimeError('No recent OPERA DBZH composites returned by source')
-        frames=[]
-        for stamp,key in items:
+        def obtain(stamp,key):
             fid=stamp.strftime('%Y%m%dT%H%M%SZ');cache=out/'frames'/f'{fid}.json'
             try:
-                if cache.exists() and (out/'frames'/f'{fid}-r.png').exists() and (out/'frames'/f'{fid}-c.png').exists():
+                if cache.exists() and all((out/'frames'/f'{fid}{ext}').exists() for ext in ('-r.png','-c.png','.npz')):
                     frame=json.loads(cache.read_text());frame['image']=f'{base}/frames/{fid}-r.png';frame['coverage']=f'{base}/frames/{fid}-c.png'
-                else:
-                    payload=request_bytes(s,SOURCE+quote(key,safe='/@'))
-                    if not payload.startswith(b'\x89HDF\r\n\x1a\n'):raise ValueError('Source response is not HDF5')
-                    with tempfile.NamedTemporaryFile(suffix='.h5') as temp:
-                        temp.write(payload);temp.flush();frame=make_frame(Path(temp.name),out,base,now)
-                    if frame['id']!=fid:raise ValueError('Observation date differs from source key')
-                frames.append(frame)
+                    return frame
+                payload=request_bytes(s,SOURCE+quote(key,safe='/@'))
+                if not payload.startswith(b'\x89HDF\r\n\x1a\n'):raise ValueError('Source response is not HDF5')
+                with tempfile.NamedTemporaryFile(suffix='.h5') as temp:
+                    temp.write(payload);temp.flush();frame=make_frame(Path(temp.name),out,base,now)
+                if frame['id']!=fid:raise ValueError('Observation date differs from source key')
+                return frame
             except Exception as exc:
                 LOG.warning('Frame %s unavailable (%s); no synthetic substitute',fid,type(exc).__name__)
+                return None
+        frames=[f for f in (obtain(stamp,key) for stamp,key in items) if f]
         if not frames:raise RuntimeError('No valid frames processed; previous manifest preserved')
+        if getattr(args,'nowcast',True):
+            frames+=nowcast_frames(out,base,frames[-1],dict(available),obtain)
     if len({f['id'] for f in frames})!=len(frames):raise ValueError('Duplicate observation identifiers')
     manifest=make_manifest(frames,now)
     publish(out,manifest,args.bucket,args.prefix)
     atomic_json(out/'manifest.json',manifest)
-    atomic_json(out/'health.json',{'ok':True,'checkedAt':iso(now),'latestObservation':frames[-1]['time'],'frames':len(frames)})
+    atomic_json(out/'health.json',{'ok':True,'checkedAt':iso(now),'latestObservation':[f for f in frames if f.get('kind')!='forecast'][-1]['time'],'forecastFrames':sum(f.get('kind')=='forecast' for f in frames),'frames':len(frames)})
     clean_local(out,now)
-    LOG.info('Published %s observations; latest %s',len(frames),frames[-1]['time'])
+    LOG.info('Published %s frames; last %s',len(frames),frames[-1]['time'])
     return manifest
 
 def parser():
@@ -276,10 +350,11 @@ def parser():
     p.add_argument('--public-base',default=os.environ.get('RADAR_PUBLIC_BASE_URL','/radar-data'))
     p.add_argument('--bucket',default=os.environ.get('RADAR_S3_BUCKET',''))
     p.add_argument('--prefix',default=os.environ.get('RADAR_S3_PREFIX','radar'))
-    p.add_argument('--history',type=int,default=120)
-    p.add_argument('--max-frames',type=int,default=13)
+    p.add_argument('--history',type=int,default=60)
+    p.add_argument('--max-frames',type=int,default=7)
     p.add_argument('--loop',type=int,default=0,help='Run sequentially every N seconds (at least 300); 0 = one cycle')
     p.add_argument('--input',help='Process a real local ODIM composite instead of fetching the public source')
+    p.add_argument('--no-nowcast',dest='nowcast',action='store_false',help='Publish observations only')
     p.add_argument('--probe',action='store_true',help='List current source objects without downloading or publishing')
     return p
 

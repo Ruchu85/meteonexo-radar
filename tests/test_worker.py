@@ -97,5 +97,36 @@ class RadarWorkerTests(unittest.TestCase):
         p=self.root/'manifest.json';w.atomic_json(p,{'ok':1});self.assertEqual(json.loads(p.read_text()),{'ok':1})
         out=self.root/'frames';out.mkdir();old=out/'20261023T120000Z-r.png';new=out/'20261025T120000Z-r.png';old.write_bytes(b'x');new.write_bytes(b'x')
         w.clean_local(self.root,NOW);self.assertFalse(old.exists());self.assertTrue(new.exists())
+    def test_grid_cache_round_trip(self):
+        g=np.full((4,5),np.nan,dtype=np.float32);g[1,1]=31.5;m=np.zeros((4,5),dtype=np.uint8);m[1,1]=1
+        w.save_grid(self.root/'g.npz',g,m);dbz,mask=w.load_grid(self.root/'g.npz')
+        self.assertEqual(dbz[1,1],31.5);self.assertTrue(np.isnan(dbz[0,0]));self.assertEqual(mask[1,1],1)
+    def test_nowcast_moves_echo_downstream_without_creating_rain(self):
+        try:import pysteps  # noqa: F401
+        except ImportError:self.skipTest('pysteps not installed')
+        grids=[]
+        for step in range(3):
+            g=np.full((120,160),np.nan,dtype=np.float32);y,x=np.ogrid[:120,:160]
+            g[(y-60)**2+(x-(40+6*step))**2<=12**2]=40;grids.append(g)  # echo moving 6 px east per step
+        out=w.extrapolate(grids,leads=3)
+        self.assertEqual(out.shape,(3,120,160))
+        cols=[np.nonzero(f>=w.STOPS[0])[1].mean() for f in out]
+        self.assertGreater(cols[0],52);self.assertTrue(cols[0]<cols[1]<cols[2])
+        self.assertLessEqual(float(out.max()),40.01)
+    def test_nowcast_without_equally_spaced_inputs_publishes_observations_only(self):
+        latest={'id':'20261025T120000Z','time':'2026-10-25T12:00:00Z'}
+        frames=w.nowcast_frames(self.root,'/radar-data',latest,{NOW:'k'},lambda *a:None)
+        self.assertEqual(frames,[])
+    def test_nowcast_frames_contract(self):
+        out=self.root/'out';lid='20261025T120000Z'
+        g=np.full((30,40),np.nan,dtype=np.float32);g[10:15,10:15]=30;m=np.ones((30,40),dtype=np.uint8)
+        w.save_grid(out/'frames'/f'{lid}.npz',g,m)
+        with patch.object(w,'extrapolate',return_value=np.stack([g]*6)):
+            frames=w.make_nowcast(out,'/radar-data',{'id':lid},[g,g,g])
+        self.assertEqual([f['leadMinutes'] for f in frames],[10,20,30,40,50,60])
+        self.assertEqual(frames[0]['id'],'20261025T121000Z');self.assertEqual(frames[-1]['time'],'2026-10-25T13:00:00Z')
+        self.assertTrue(all(f['kind']=='forecast' and f['base']==lid for f in frames))
+        self.assertEqual(frames[2]['image'],f'/radar-data/frames/{lid}-f30.png');self.assertEqual(frames[2]['coverage'],f'/radar-data/frames/{lid}-c.png')
+        self.assertTrue((out/'frames'/f'{lid}-f60.png').read_bytes().startswith(b'\x89PNG'))
 
 if __name__=='__main__':unittest.main()

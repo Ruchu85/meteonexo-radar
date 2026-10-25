@@ -40,7 +40,7 @@ jobs:
           key: radar-${{ github.run_id }}
           restore-keys: radar-
       - name: Procesar OPERA
-        run: python worker.py --history 120 --max-frames 13
+        run: python worker.py --history 60 --max-frames 7
       - uses: actions/cache/save@v4
         if: always()
         with:
