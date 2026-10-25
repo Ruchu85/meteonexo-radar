@@ -1,7 +1,7 @@
 name: Radar OPERA
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '3,18,33,48 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
@@ -52,12 +52,27 @@ jobs:
           path: site
       - id: deploy
         uses: actions/deploy-pages@v4
-      # GitHub disables cron workflows in public repos after 60 days without activity.
-      - name: Mantener el cron activo
-        if: github.event_name == 'schedule'
+  # Primary trigger. GitHub scheduled workflows are unreliable on young repos (the first
+  # cron never fired in 80 minutes), so every run schedules the next one itself.
+  # workflow_dispatch started with GITHUB_TOKEN is allowed to start new runs.
+  next:
+    needs: sync
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Esperar al siguiente hueco y encadenar
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          if [ "$(date -u +%d%H)" = "0100" ]; then
-            gh api -X PUT "repos/${{ github.repository }}/actions/workflows/radar.yml/enable"
-          fi
+          # Next slot at minute ≡ 8 (mod 10): OPERA composites are available ~5 min after
+          # their nominal time, and the worker starts fetching ~1 min after the run begins.
+          now=$(date -u +%s); minute=$(( (now / 60) % 10 ))
+          wait=$(( ((8 - minute + 10) % 10) * 60 - now % 60 ))
+          [ "$wait" -lt 30 ] && wait=$((wait + 600))
+          echo "Esperando ${wait}s"; sleep "$wait"
+          # A backup cron run may already be queued: it becomes the next link, avoiding duplicate chains.
+          others=$(gh api "repos/$REPO/actions/workflows/radar.yml/runs?per_page=30"             -q "[.workflow_runs[] | select(.id != $RUN_ID and (.status==\"queued\" or .status==\"in_progress\" or .status==\"waiting\" or .status==\"pending\"))] | length")
+          if [ "$others" = "0" ]; then gh workflow run radar.yml -R "$REPO" --ref main; echo "Siguiente ciclo lanzado"; else echo "Ya hay $others ejecuciones en cola; no se duplica"; fi
