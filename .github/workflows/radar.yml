@@ -41,6 +41,12 @@ jobs:
           restore-keys: radar-
       - name: Procesar OPERA
         run: python worker.py --history 60 --max-frames 7
+      # Forecast maps: only does work when DWD has published a new complete ICON-EU run.
+      # A failure here never blocks the radar publication.
+      - name: Pronostico ICON-EU
+        continue-on-error: true
+        timeout-minutes: 9
+        run: python model.py
       - uses: actions/cache/save@v4
         if: always()
         with:

@@ -17,6 +17,16 @@ for name in {Path(frame[key]).name for frame in manifest['frames'] for key in ('
 for name in ('manifest.json', 'health.json'):
     if (data / name).exists():
         shutil.copy2(data / name, site / name)
+# ICON-EU forecast: manifest plus only the images it references.
+model_manifest = data / 'model' / 'manifest.json'
+if model_manifest.exists():
+    model = json.loads(model_manifest.read_text())
+    (site / 'model').mkdir(parents=True, exist_ok=True)
+    for frame in model['frames']:
+        name = Path(frame['image']).name
+        shutil.copy2(data / 'model' / name, site / 'model' / name)
+    shutil.copy2(model_manifest, site / 'model' / 'manifest.json')
+    print(f"Model ready: run {model['run']}, {len(model['frames'])} frames")
 (site / '.nojekyll').touch()
 (site / 'index.html').write_text(
     '<!doctype html><meta charset="utf-8"><title>MeteoNexo radar data</title>'
