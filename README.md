@@ -11,6 +11,10 @@ Un ciclo fallido no publica nada: Pages sigue sirviendo la última secuencia vá
 
 Los fotogramas con `kind: "forecast"` (+10 a +60 min) se calculan con [pysteps](https://pysteps.github.io/): movimiento por Lucas-Kanade a partir de las observaciones de hace 20, 10 y 0 minutos, y advección semi-lagrangiana del último campo. Solo desplaza los ecos observados: no crea ni intensifica lluvia, así que no anticipa tormentas que aún no existen. Si falta alguna entrada o el cálculo falla, se publican solo las observaciones.
 
+## Nubes de satélite
+
+Bajo la lluvia del radar se dibujan las nubes del infrarrojo de Meteosat (MTG, 10,5 µm, cada 10 minutos, de día y de noche), obtenidas del WMS EUMETView de [EUMETSAT](https://view.eumetsat.int/). Si el satélite no responde, se publica solo la lluvia.
+
 ## Pronóstico por horas (ICON-EU)
 
 `model.py` publica en `model/` la precipitación prevista (mm/h) y la nubosidad del modelo ICON-EU del Deutscher Wetterdienst, horaria hasta +78 h y cada 3 h hasta +120 h, cuando DWD termina una pasada (00/06/12/18 UTC). Si falla, el radar se publica igualmente y se conserva el pronóstico anterior.
@@ -18,6 +22,8 @@ Los fotogramas con `kind: "forecast"` (+10 a +60 min) se calculan con [pysteps](
 ## Fuente y licencia de los datos
 
 Datos de radar: [EUMETNET OPERA](https://eumetnet.github.io/openradardata-documentation/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Procesado (reproyección por vecino más próximo, recorte, escala de color y extrapolación) por MeteoNexo.
+
+Nubes: © EUMETSAT (Meteosat).
 
 Pronóstico: Quelle: [Deutscher Wetterdienst](https://opendata.dwd.de/weather/nwp/icon-eu/) (DL-DE-BY-2.0 / GeoNutzV), modelo ICON-EU; recortado, reproyectado y coloreado por MeteoNexo.
 

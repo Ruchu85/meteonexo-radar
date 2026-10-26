@@ -32,8 +32,8 @@ class ModelTests(unittest.TestCase):
         rgba, wet = m.render(rate, clouds)
         self.assertEqual(wet, 2, 'below 0.1 mm/h is not rain')
         self.assertEqual(rgba[0, 0, 3], 0)
-        self.assertEqual(rgba[1, 1, 3], 215); self.assertEqual(rgba[2, 2, :3].tolist(), m.RATE_COLORS[-1].astype(int).tolist())
-        self.assertEqual(rgba[3, 3, 3], 120, 'overcast sky is a translucent grey'); self.assertEqual(rgba[3, 2, 3], 0)
+        self.assertEqual(rgba[1, 1, 3], 245); self.assertEqual(rgba[2, 2, :3].tolist(), m.RATE_COLORS[-1].astype(int).tolist())
+        self.assertEqual(rgba[3, 3, 3], 170, 'overcast sky is a translucent slate grey'); self.assertEqual(rgba[3, 2, 3], 0)
 
     def test_crop_keeps_the_radar_extent_with_cell_edges(self):
         # Synthetic ICON-EU-like grid: 0.0625 deg, west -23.5, north 70.5

@@ -58,7 +58,7 @@ class RadarWorkerTests(unittest.TestCase):
         rgba,coverage,stats=w.render_composite(radar,width=180)
         self.assertTrue(np.all(rgba[0:10,:,3]==0));self.assertTrue(np.all(coverage[0:10,:,3]==0))
         self.assertTrue(np.all(rgba[-10:,:,3]==0));self.assertTrue(np.all(coverage[-10:,:,3]>0))
-        self.assertTrue(np.any(rgba[40:70,:,3]==235));self.assertGreater(stats['observedFraction'],.7)
+        self.assertTrue(np.any(rgba[40:70,:,3]==255));self.assertGreater(stats['observedFraction'],.7)
     def test_future_and_old_files_rejected(self):
         for time in [NOW+dt.timedelta(hours=1),NOW-dt.timedelta(hours=7)]:
             with self.assertRaises(ValueError):w.make_frame(synthetic(self.root/'fixture.h5',when=time),self.root/'out','/radar-data',NOW)
@@ -132,5 +132,23 @@ class RadarWorkerTests(unittest.TestCase):
         frame=w.make_frame(synthetic(self.root/'fixture.h5'),self.root/'out','/radar-data',NOW)
         self.assertIsInstance(frame['echoPixels'],int);self.assertGreater(frame['echoPixels'],0)
         self.assertEqual(w.echo_pixels(np.zeros((4,4,4),dtype=np.uint8)),0)
+    def test_cloud_layer_clear_sky_transparent_thick_cloud_visible(self):
+        g=np.array([[30,55,72],[100,180,255]],dtype=np.uint8)
+        c=w.cloud_layer(g)
+        self.assertEqual(c[0,:,3].tolist(),[0,0,0])
+        self.assertTrue(0<c[1,0,3]<c[1,1,3]);self.assertEqual(c[1,1,3],185);self.assertEqual(c[1,2,3],185)
+    def test_rain_is_drawn_over_clouds_and_satellite_failure_keeps_rain(self):
+        sat=w.Satellite(None,self.root,(4,2))
+        rain=np.zeros((2,4,4),dtype=np.uint8);rain[0,0]=[30,120,220,255]
+        with patch.object(sat,'gray',return_value=(np.full((2,4),200,dtype=np.uint8),NOW)):
+            out=sat.composite(rain,NOW)
+        self.assertEqual(out[0,0].tolist(),[30,120,220,255]);self.assertGreater(out[1,1,3],0)
+        sat2=w.Satellite(None,self.root,(4,2))
+        with patch.object(sat2,'gray',side_effect=RuntimeError('down')):
+            self.assertIs(sat2.composite(rain,NOW),rain)
+        self.assertTrue(sat2.failed)
+    def test_satellite_requests_only_eumetview(self):
+        sat=w.Satellite(None,self.root,(4,2))
+        with self.assertRaises(ValueError):sat.request('https://evil.example/geoserver/ows',{})
 
 if __name__=='__main__':unittest.main()

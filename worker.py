@@ -37,7 +37,7 @@ SOURCE='https://s3.waw3-1.cloudferro.com/openradar-24h/'
 BOUNDS=(-11.5,34.5,5.5,45.6)
 MAX_FILE=96*1024*1024
 STOPS=np.array([5,15,25,35,45,55,65],dtype=np.float32)
-COLORS=np.array([[115,198,223],[66,139,208],[72,177,131],[227,205,87],[236,145,68],[214,82,105],[159,105,186]],dtype=np.float32)
+COLORS=np.array([[95,180,240],[30,120,220],[15,75,190],[250,205,40],[245,125,30],[220,35,55],[150,40,165]],dtype=np.float32)
 KEY_RE=re.compile(r'(?:^|/)OPERA@(\d{8}T\d{4}(?:\d{2})?)@[^/]+@DBZH\.h5$')
 FRAME_RE=re.compile(r'^\d{8}T\d{6}Z$')
 LOG=logging.getLogger('meteonexo.radar')
@@ -162,7 +162,7 @@ def reproject_grid(radar,width=1536):
     reproject(radar['observed'],mask,src_nodata=0,dst_nodata=0,**common)
     return target,mask
 
-def colorize(target,mask,alpha=235):
+def colorize(target,mask,alpha=255):
     rgba=np.zeros((*target.shape,4),dtype=np.uint8)
     colored=(mask==1)&np.isfinite(target)&(target>=STOPS[0])
     for channel in range(3):
@@ -247,7 +247,7 @@ def extrapolate(grids,leads=NOWCAST_LEADS):
     out=advect(fields[-1],velocity,leads,outval=NOWCAST_FLOOR)
     return np.where(np.isfinite(out),out,NOWCAST_FLOOR).astype(np.float32)
 
-def make_nowcast(output,base,latest,grids):
+def make_nowcast(output,base,latest,grids,sat=None):
     """Forecast frames +10..+60 min from `latest` (the newest observed frame)."""
     lid=latest['id'];start=dt.datetime.strptime(lid,'%Y%m%dT%H%M%SZ').replace(tzinfo=UTC)
     fields=extrapolate(grids)
@@ -255,13 +255,16 @@ def make_nowcast(output,base,latest,grids):
     frames=[]
     for i,field in enumerate(fields,1):
         lead=i*NOWCAST_STEP;valid=start+dt.timedelta(minutes=lead)
-        rgba=colorize(field,mask,alpha=215)
+        rgba=colorize(field,mask)
+        echo=echo_pixels(rgba)
+        if sat is not None:
+            rgba=sat.composite(rgba,start)
         atomic_png(output/'frames'/f'{lid}-f{lead}.png',rgba)
         frames.append({'id':valid.strftime('%Y%m%dT%H%M%SZ'),'time':iso(valid),'kind':'forecast','base':lid,'leadMinutes':lead,
-                       'image':f'{base}/frames/{lid}-f{lead}.png','coverage':f'{base}/frames/{lid}-c.png','echoPixels':echo_pixels(rgba)})
+                       'image':f'{base}/frames/{lid}-f{lead}.png','coverage':f'{base}/frames/{lid}-c.png','echoPixels':echo})
     return frames
 
-def nowcast_frames(output,base,latest,available,obtain):
+def nowcast_frames(output,base,latest,available,obtain,sat=None):
     """Nowcast inputs are the latest observation and the ones 10 and 20 minutes earlier.
 
     Any failure (missing input, pysteps error) publishes observations only.
@@ -273,19 +276,109 @@ def nowcast_frames(output,base,latest,available,obtain):
         for t in stamps[:-1]:
             if not obtain(t,available[t]):raise RuntimeError('Nowcast input unavailable')
         grids=[load_grid(output/'frames'/f"{t.strftime('%Y%m%dT%H%M%SZ')}.npz")[0] for t in stamps]
-        frames=make_nowcast(output,base,latest,grids)
+        frames=make_nowcast(output,base,latest,grids,sat)
         LOG.info('Nowcast from %s: %s forecast frames',latest['time'],len(frames))
         return frames
     except Exception as exc:
         LOG.warning('Nowcast skipped (%s: %s); publishing observations only',type(exc).__name__,exc)
         return []
 
+# Clouds from Meteosat (MTG FCI 10.5 um infrared, every 10 min, day and night) via EUMETSAT's
+# EUMETView WMS (no fees or access constraints; credit "EUMETSAT"). The radar only sees precipitation:
+# the satellite adds the cloud field under it. A satellite failure never blocks the radar.
+SAT_HOST='view.eumetsat.int'
+SAT_WMS='https://view.eumetsat.int/geoserver/ows'
+SAT_CAPS='https://view.eumetsat.int/geoserver/mtg_fd/ir105_hrfi/ows'
+SAT_LAYER='mtg_fd:ir105_hrfi'
+# Grey levels of the WMS rendering: sea/land ~30-55, thin cloud from ~75, thick cloud 130+.
+SAT_CLEAR,SAT_THICK=72,180
+
+def cloud_layer(gray):
+    g=gray.astype(np.float32)
+    t=np.clip((g-SAT_CLEAR)/(SAT_THICK-SAT_CLEAR),0,1)
+    rgba=np.zeros((*g.shape,4),dtype=np.uint8)
+    # Thin cloud light slate, thick cloud darker slate: both readable over the light base map.
+    for ch,(thin,thick) in enumerate(((150,95),(158,105),(172,122))):
+        rgba[:,:,ch]=(thin+(thick-thin)*t).astype(np.uint8)
+    rgba[:,:,3]=(np.power(t,0.8)*185).astype(np.uint8)
+    return rgba
+
+class Satellite:
+    def __init__(self,s,output,size):
+        self.s=s;self.dir=output/'sat';self.width,self.height=size;self.latest=None;self.failed=False
+    def request(self,url,params):
+        u=urlparse(url)
+        if u.scheme!='https' or u.netloc!=SAT_HOST or not u.path.startswith('/geoserver/'):raise ValueError('Unexpected satellite URL')
+        r=self.s.get(url,params=params,timeout=(10,60),allow_redirects=False);r.raise_for_status()
+        if len(r.content)>12*1024*1024:raise ValueError('Satellite response too large')
+        return r
+    def newest(self):
+        if self.latest is None:
+            caps=self.request(SAT_CAPS,{'service':'WMS','version':'1.3.0','request':'GetCapabilities'}).text
+            m=re.search(r'<Dimension name="time" default="(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.\d+)?Z"',caps)
+            if not m:raise ValueError('No satellite time dimension')
+            self.latest=dt.datetime.strptime(m.group(1),'%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC)
+        return self.latest
+    def gray(self,when):
+        """Infrared image for the 10-minute slot of `when` (or the newest available before it)."""
+        slot=min(when,self.newest());slot=slot.replace(minute=slot.minute-slot.minute%10,second=0,microsecond=0)
+        path=self.dir/f"{slot.strftime('%Y%m%dT%H%MZ')}.png"
+        if not path.exists():
+            west,south,east,north=BOUNDS
+            xx,yy=transform('EPSG:4326','EPSG:3857',[west,east],[south,north])
+            r=self.request(SAT_WMS,{'service':'WMS','version':'1.3.0','request':'GetMap','layers':SAT_LAYER,'styles':'','crs':'EPSG:3857',
+                'bbox':f'{xx[0]},{yy[0]},{xx[1]},{yy[1]}','width':self.width,'height':self.height,'format':'image/png','time':slot.strftime('%Y-%m-%dT%H:%M:00Z')})
+            if not r.content.startswith(b'\x89PNG'):raise ValueError('Satellite response is not a PNG')
+            self.dir.mkdir(parents=True,exist_ok=True)
+            with tempfile.NamedTemporaryFile(suffix='.png',dir=self.dir,delete=False) as fh:fh.write(r.content);temp=Path(fh.name)
+            os.replace(temp,path)
+        img=np.array(Image.open(path).convert('L'))
+        if img.shape!=(self.height,self.width):raise ValueError('Unexpected satellite image size')
+        return img,slot
+    def composite(self,rain,when):
+        """Rain (opaque) over satellite clouds; rain-only if the satellite is unavailable."""
+        if self.failed:return rain
+        try:
+            gray,_=self.gray(when)
+        except Exception as exc:
+            self.failed=True;LOG.warning('Satellite clouds unavailable (%s: %s); radar published without clouds',type(exc).__name__,exc)
+            return rain
+        return np.where(rain[:,:,3:4]>0,rain,cloud_layer(gray))
+    def clean(self,now):
+        for f in self.dir.glob('*.png') if self.dir.exists() else []:
+            try:
+                if dt.datetime.strptime(f.stem,'%Y%m%dT%H%MZ').replace(tzinfo=UTC)<now-dt.timedelta(hours=6):f.unlink(missing_ok=True)
+            except ValueError:f.unlink(missing_ok=True)
+
+def frame_size(width=1536):
+    west,south,east,north=BOUNDS
+    xx,yy=transform('EPSG:4326','EPSG:3857',[west,east],[south,north])
+    return width,round(width*(yy[1]-yy[0])/(xx[1]-xx[0]))
+
+def add_clouds(frame,output,base,sat):
+    """(Re)builds the published image of an observed frame: rain from the cached dBZ grid over clouds."""
+    fid=frame['id']
+    when=dt.datetime.strptime(fid,'%Y%m%dT%H%M%SZ').replace(tzinfo=UTC)
+    own=when.replace(minute=when.minute-when.minute%10)
+    # Done once the clouds of the frame's own 10-minute slot are in; until then (satellite ~20 min
+    # behind the radar) the newest clouds are used and the image is rebuilt on later cycles.
+    if frame.get('cloudsTime')==iso(own) or sat is None or sat.failed:return frame
+    dbz,mask=load_grid(output/'frames'/f'{fid}.npz')
+    rain=colorize(dbz,mask)
+    image=sat.composite(rain,when)
+    atomic_png(output/'frames'/f'{fid}-r.png',image)
+    frame['echoPixels']=echo_pixels(rain)
+    if not sat.failed:
+        frame['cloudsTime']=iso(sat.gray(when)[1])
+    atomic_json(output/'frames'/f'{fid}.json',{k:v for k,v in frame.items()})
+    return frame
+
 def make_manifest(frames,now=None):
     return {'version':1,'product':'DBZH','unit':'dBZ','projection':'EPSG:3857','bounds':list(BOUNDS),
             'generatedAt':iso(now or utcnow()),'source':'EUMETNET OPERA','license':'CC BY 4.0',
             'sourceUrl':'https://eumetnet.github.io/openradardata-documentation/',
             'licenseUrl':'https://creativecommons.org/licenses/by/4.0/',
-            'processing':'Nearest-neighbour reprojection, geographic crop and colour mapping by MeteoNexo; values below 5 dBZ not coloured. Frames with kind=forecast are a MeteoNexo extrapolation nowcast (pysteps Lucas-Kanade + semi-Lagrangian advection), not observations.',
+            'processing':'Nearest-neighbour reprojection, geographic crop and colour mapping by MeteoNexo; values below 5 dBZ not coloured. Clouds: Meteosat MTG 10.5 um infrared (EUMETSAT). Frames with kind=forecast are a MeteoNexo extrapolation nowcast (pysteps Lucas-Kanade + semi-Lagrangian advection), not observations.',
             'frames':sorted(frames,key=lambda x:x['time'])}
 
 def publish(output,manifest,bucket,prefix='radar'):
@@ -321,6 +414,7 @@ def cycle(args,s):
         available=discover(s,now,args.history)
         items=select_frames(available,args.max_frames,args.history)
         if not items:raise RuntimeError('No recent OPERA DBZH composites returned by source')
+        sat=Satellite(s,out,frame_size()) if getattr(args,'clouds',True) else None
         def obtain(stamp,key):
             fid=stamp.strftime('%Y%m%dT%H%M%SZ');cache=out/'frames'/f'{fid}.json'
             try:
@@ -339,9 +433,11 @@ def cycle(args,s):
                 LOG.warning('Frame %s unavailable (%s); no synthetic substitute',fid,type(exc).__name__)
                 return None
         frames=[f for f in (obtain(stamp,key) for stamp,key in items) if f]
+        frames=[add_clouds(f,out,base,sat) for f in frames]
         if not frames:raise RuntimeError('No valid frames processed; previous manifest preserved')
         if getattr(args,'nowcast',True):
-            frames+=nowcast_frames(out,base,frames[-1],dict(available),obtain)
+            frames+=nowcast_frames(out,base,frames[-1],dict(available),obtain,sat)
+        if sat is not None:sat.clean(now)
     if len({f['id'] for f in frames})!=len(frames):raise ValueError('Duplicate observation identifiers')
     manifest=make_manifest(frames,now)
     publish(out,manifest,args.bucket,args.prefix)
@@ -362,6 +458,7 @@ def parser():
     p.add_argument('--loop',type=int,default=0,help='Run sequentially every N seconds (at least 300); 0 = one cycle')
     p.add_argument('--input',help='Process a real local ODIM composite instead of fetching the public source')
     p.add_argument('--no-nowcast',dest='nowcast',action='store_false',help='Publish observations only')
+    p.add_argument('--no-clouds',dest='clouds',action='store_false',help='Do not add Meteosat clouds')
     p.add_argument('--probe',action='store_true',help='List current source objects without downloading or publishing')
     return p
 

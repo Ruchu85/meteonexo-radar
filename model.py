@@ -43,6 +43,8 @@ RATE_COLORS = np.array([[168, 214, 240], [110, 180, 232], [55, 135, 215], [30, 9
                         [250, 210, 70], [245, 140, 50], [220, 50, 70], [160, 60, 170]], dtype=np.float32)
 FILE_RE = re.compile(r'icon-eu_europe_regular-lat-lon_single-level_(\d{10})_(\d{3})_TOT_PREC\.grib2\.bz2')
 LOG = logging.getLogger('meteonexo.model')
+# Bump when the rendering changes: an already processed run is rendered again with the new look.
+RENDER_VERSION = 2
 
 
 def iso(value): return value.astimezone(UTC).isoformat(timespec='seconds').replace('+00:00', 'Z')
@@ -131,16 +133,16 @@ def render(rate, clouds):
     h, w = rate.shape
     rgba = np.zeros((h, w, 4), dtype=np.uint8)
     cc = np.nan_to_num(clouds, nan=0.0)
-    alpha = np.clip((cc - 25) / 75, 0, 1) * 120
+    alpha = np.clip((cc - 20) / 80, 0, 1) * 170
     # Slate grey: visible over the light IGN base map without hiding it.
-    rgba[..., 0] = 150; rgba[..., 1] = 158; rgba[..., 2] = 172
+    rgba[..., 0] = 112; rgba[..., 1] = 122; rgba[..., 2] = 138
     rgba[..., 3] = alpha.astype(np.uint8)
     r = np.nan_to_num(rate, nan=0.0)
     wet = r >= RATE_STOPS[0]
     lr = np.log(np.clip(r, RATE_STOPS[0], RATE_STOPS[-1]))
     for ch in range(3):
         rgba[..., ch] = np.where(wet, np.interp(lr, np.log(RATE_STOPS), RATE_COLORS[:, ch]), rgba[..., ch]).astype(np.uint8)
-    rgba[..., 3] = np.where(wet, 215, rgba[..., 3])
+    rgba[..., 3] = np.where(wet, 245, rgba[..., 3])
     return rgba, int(np.count_nonzero(wet))
 
 
@@ -196,7 +198,7 @@ def process(s, run, output, base):
 
 
 def manifest(run, frames, now):
-    return {'version': 1, 'product': 'ICON-EU', 'quantity': 'precipitation_rate', 'unit': 'mm/h', 'projection': 'EPSG:3857',
+    return {'version': 1, 'renderVersion': RENDER_VERSION, 'product': 'ICON-EU', 'quantity': 'precipitation_rate', 'unit': 'mm/h', 'projection': 'EPSG:3857',
             'bounds': list(BOUNDS), 'run': iso(run), 'generatedAt': iso(now), 'frames': frames,
             'source': 'Deutscher Wetterdienst (DWD), modelo ICON-EU', 'license': 'DL-DE-BY-2.0 / GeoNutzV',
             'sourceUrl': 'https://opendata.dwd.de/weather/nwp/icon-eu/',
@@ -216,7 +218,8 @@ def main():
         LOG.warning('No complete ICON-EU run listed; keeping the previous forecast'); return 0
     run = runs[-1]
     current = out / 'manifest.json'
-    if current.exists() and json.loads(current.read_text()).get('run') == iso(run):
+    previous = json.loads(current.read_text()) if current.exists() else {}
+    if previous.get('run') == iso(run) and previous.get('renderVersion') == RENDER_VERSION:
         LOG.info('ICON-EU %s already processed', iso(run)); return 0
     stage = Path(tempfile.mkdtemp(dir=out.parent, prefix='model-'))
     try:
