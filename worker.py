@@ -171,6 +171,10 @@ def colorize(target,mask,alpha=235):
     rgba[:,:,3]=np.where(colored,alpha,0)
     return rgba
 
+# Pixels drawn as precipitation (>= 5 dBZ). Zero means "measured, no rain", which the viewer states explicitly.
+def echo_pixels(rgba):
+    return int(np.count_nonzero(rgba[:,:,3]))
+
 def render_composite(radar,width=1536):
     target,mask=reproject_grid(radar,width)
     height=target.shape[0]
@@ -180,7 +184,7 @@ def render_composite(radar,width=1536):
     missing=mask==0;hatch=((rows+cols)%16)<3
     no_data[:,:,:3]=[89,105,108]
     no_data[:,:,3]=np.where(missing,np.where(hatch,105,35),0).astype(np.uint8)
-    return rgba,no_data,{'width':width,'height':height,'observedFraction':round(float(np.mean(mask==1)),5),'dbz':target,'mask':mask}
+    return rgba,no_data,{'width':width,'height':height,'observedFraction':round(float(np.mean(mask==1)),5),'echoPixels':echo_pixels(rgba),'dbz':target,'mask':mask}
 
 def atomic_json(target,value):
     target.parent.mkdir(parents=True,exist_ok=True)
@@ -213,7 +217,7 @@ def make_frame(source_file,output,base,now=None):
     save_grid(output/'frames'/f'{fid}.npz',stats['dbz'],stats['mask'])
     frame={'id':fid,'time':iso(radar['time']),'image':f'{base}/frames/{fid}-r.png',
            'coverage':f'{base}/frames/{fid}-c.png','observedFraction':stats['observedFraction'],
-           'nativeScaleMeters':radar['nativeScale']}
+           'echoPixels':stats['echoPixels'],'nativeScaleMeters':radar['nativeScale']}
     atomic_json(output/'frames'/f'{fid}.json',frame)
     return frame
 
@@ -251,9 +255,10 @@ def make_nowcast(output,base,latest,grids):
     frames=[]
     for i,field in enumerate(fields,1):
         lead=i*NOWCAST_STEP;valid=start+dt.timedelta(minutes=lead)
-        atomic_png(output/'frames'/f'{lid}-f{lead}.png',colorize(field,mask,alpha=215))
+        rgba=colorize(field,mask,alpha=215)
+        atomic_png(output/'frames'/f'{lid}-f{lead}.png',rgba)
         frames.append({'id':valid.strftime('%Y%m%dT%H%M%SZ'),'time':iso(valid),'kind':'forecast','base':lid,'leadMinutes':lead,
-                       'image':f'{base}/frames/{lid}-f{lead}.png','coverage':f'{base}/frames/{lid}-c.png'})
+                       'image':f'{base}/frames/{lid}-f{lead}.png','coverage':f'{base}/frames/{lid}-c.png','echoPixels':echo_pixels(rgba)})
     return frames
 
 def nowcast_frames(output,base,latest,available,obtain):
@@ -321,6 +326,8 @@ def cycle(args,s):
             try:
                 if cache.exists() and all((out/'frames'/f'{fid}{ext}').exists() for ext in ('-r.png','-c.png','.npz')):
                     frame=json.loads(cache.read_text());frame['image']=f'{base}/frames/{fid}-r.png';frame['coverage']=f'{base}/frames/{fid}-c.png'
+                    # Frames cached before echo counting existed: count from the published PNG.
+                    if 'echoPixels' not in frame:frame['echoPixels']=echo_pixels(np.array(Image.open(out/'frames'/f'{fid}-r.png').convert('RGBA')))
                     return frame
                 payload=request_bytes(s,SOURCE+quote(key,safe='/@'))
                 if not payload.startswith(b'\x89HDF\r\n\x1a\n'):raise ValueError('Source response is not HDF5')

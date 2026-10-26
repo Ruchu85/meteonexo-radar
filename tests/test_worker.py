@@ -128,5 +128,9 @@ class RadarWorkerTests(unittest.TestCase):
         self.assertTrue(all(f['kind']=='forecast' and f['base']==lid for f in frames))
         self.assertEqual(frames[2]['image'],f'/radar-data/frames/{lid}-f30.png');self.assertEqual(frames[2]['coverage'],f'/radar-data/frames/{lid}-c.png')
         self.assertTrue((out/'frames'/f'{lid}-f60.png').read_bytes().startswith(b'\x89PNG'))
+    def test_frames_report_echo_pixels_including_zero(self):
+        frame=w.make_frame(synthetic(self.root/'fixture.h5'),self.root/'out','/radar-data',NOW)
+        self.assertIsInstance(frame['echoPixels'],int);self.assertGreater(frame['echoPixels'],0)
+        self.assertEqual(w.echo_pixels(np.zeros((4,4,4),dtype=np.uint8)),0)
 
 if __name__=='__main__':unittest.main()
