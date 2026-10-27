@@ -378,7 +378,7 @@ def make_manifest(frames,now=None):
             'generatedAt':iso(now or utcnow()),'source':'EUMETNET OPERA','license':'CC BY 4.0',
             'sourceUrl':'https://eumetnet.github.io/openradardata-documentation/',
             'licenseUrl':'https://creativecommons.org/licenses/by/4.0/',
-            'processing':'Nearest-neighbour reprojection, geographic crop and colour mapping by MeteoNexo; values below 5 dBZ not coloured. Clouds: Meteosat MTG 10.5 um infrared (EUMETSAT). Frames with kind=forecast are a MeteoNexo extrapolation nowcast (pysteps Lucas-Kanade + semi-Lagrangian advection), not observations.',
+            'processing':'Nearest-neighbour reprojection, geographic crop and colour mapping by TiempoEn; values below 5 dBZ not coloured. Clouds: Meteosat MTG 10.5 um infrared (EUMETSAT). Frames with kind=forecast are a MeteoNexo extrapolation nowcast (pysteps Lucas-Kanade + semi-Lagrangian advection), not observations.',
             'frames':sorted(frames,key=lambda x:x['time'])}
 
 def publish(output,manifest,bucket,prefix='radar'):

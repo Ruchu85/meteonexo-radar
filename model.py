@@ -202,7 +202,7 @@ def manifest(run, frames, now):
             'bounds': list(BOUNDS), 'run': iso(run), 'generatedAt': iso(now), 'frames': frames,
             'source': 'Deutscher Wetterdienst (DWD), modelo ICON-EU', 'license': 'DL-DE-BY-2.0 / GeoNutzV',
             'sourceUrl': 'https://opendata.dwd.de/weather/nwp/icon-eu/',
-            'processing': 'Recorte de Peninsula y Baleares, reproyeccion bilineal a Web Mercator, tasa media por intervalo y escala de color de MeteoNexo.'}
+            'processing': 'Recorte de Peninsula y Baleares, reproyeccion bilineal a Web Mercator, tasa media por intervalo y escala de color de TiempoEn.'}
 
 
 def main():
