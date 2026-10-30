@@ -47,6 +47,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 9
         run: python model.py
+      # Forecast for the TiempoEn home map, about every 30 minutes. Never blocks the radar publication.
+      - name: Prevision de la portada
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python home_snapshot.py
       - uses: actions/cache/save@v4
         if: always()
         with:

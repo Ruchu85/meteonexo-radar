@@ -14,7 +14,7 @@ manifest = json.loads((data / 'manifest.json').read_text())
 # Observed frames reference {id}-r/-c.png; forecast frames {base}-f{lead}.png and the base coverage.
 for name in {Path(frame[key]).name for frame in manifest['frames'] for key in ('image', 'coverage')}:
     shutil.copy2(data / 'frames' / name, site / 'frames' / name)
-for name in ('manifest.json', 'health.json'):
+for name in ('manifest.json', 'health.json', 'home-weather.json'):
     if (data / name).exists():
         shutil.copy2(data / name, site / name)
 # ICON-EU forecast: manifest plus only the images it references.
