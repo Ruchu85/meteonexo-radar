@@ -29,8 +29,8 @@ if model_manifest.exists():
     print(f"Model ready: run {model['run']}, {len(model['frames'])} frames")
 (site / '.nojekyll').touch()
 (site / 'index.html').write_text(
-    '<!doctype html><meta charset="utf-8"><title>MeteoNexo radar data</title>'
-    '<p>Datos de radar procesados para <a href="https://meteonexo.vercel.app/radar">MeteoNexo</a>. '
+    '<!doctype html><meta charset="utf-8"><title>TiempoEn radar data</title>'
+    '<p>Datos de radar procesados para <a href="https://tiempoen.es/radar">TiempoEn</a>. '
     'Fuente: <a href="https://eumetnet.github.io/openradardata-documentation/">EUMETNET OPERA</a>, '
     '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>'
 )

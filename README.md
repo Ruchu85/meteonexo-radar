@@ -1,6 +1,6 @@
 # MeteoNexo radar
 
-Procesador del radar de [MeteoNexo](https://meteonexo.vercel.app/radar). Cada 10 minutos GitHub Actions descarga los compuestos de reflectividad (DBZH) de EUMETNET OPERA, los reproyecta a Web Mercator, los recorta a Península y Baleares y publica en GitHub Pages la última hora observada más una previsión inmediata (nowcast) de la próxima hora, como PNG transparentes y un `manifest.json`:
+Procesador del radar de [TiempoEn](https://tiempoen.es/radar). Cada 10 minutos GitHub Actions descarga los compuestos de reflectividad (DBZH) de EUMETNET OPERA, los reproyecta a Web Mercator, los recorta a Península y Baleares y publica en GitHub Pages la última hora observada más una previsión inmediata (nowcast) de la próxima hora, como PNG transparentes y un `manifest.json`:
 
 - Manifiesto: https://ruchu85.github.io/meteonexo-radar/manifest.json
 - Estado del último ciclo: https://ruchu85.github.io/meteonexo-radar/health.json
