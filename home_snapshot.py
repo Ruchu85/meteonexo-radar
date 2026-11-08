@@ -1,8 +1,9 @@
-"""Builds home-weather.json: the forecast behind the TiempoEn home map.
+"""Builds forecasts.json (every indexable city) and home-weather.json (the home map) for TiempoEn.
 
-AEMET rejects bursts, so the site cannot ask for every city while a visitor waits. This step asks
-the site for one city at a time, slowly, and publishes the result. The AEMET key stays on the site.
-A city that fails keeps its previous forecast until the next run.
+AEMET rejects bursts, so the site cannot ask for dozens of cities while visitors or crawlers wait.
+This step asks the site for one city at a time, slowly, and publishes the result; the site reads it
+before it goes to AEMET. The AEMET key stays on the site. A city that fails keeps its previous
+forecast, and the site judges each city's age on its own.
 """
 import argparse
 import json
@@ -16,28 +17,30 @@ SITE = os.environ.get('HOME_SITE_URL', 'https://tiempoen.es')
 MIN_AGE = timedelta(minutes=25)
 PAUSE = 5
 RETRY_PAUSE = 35
+DAY_KEYS = ('date', 'max', 'min', 'sky', 'skyCode', 'rainProbability')
 
 
 def get_json(url):
-    request = urllib.request.Request(url, headers={'Accept': 'application/json', 'User-Agent': 'TiempoEn-home-snapshot'})
-    with urllib.request.urlopen(request, timeout=30) as response:
+    request = urllib.request.Request(url, headers={'Accept': 'application/json', 'User-Agent': 'TiempoEn-forecast-snapshot'})
+    with urllib.request.urlopen(request, timeout=40) as response:
         return json.load(response)
-
-
-def fetch_city(slug, get=get_json):
-    try:
-        data = get(f'{SITE}/api/semana?ciudad={slug}&fresh=1')
-    except Exception as error:
-        print(f'{slug}: {error}')
-        return None
-    if not data.get('ok') or not data.get('days') or data.get('stale'):
-        print(f"{slug}: {data.get('reason', 'stale' if data.get('stale') else 'no data')}")
-        return None
-    return {'days': data['days'], 'issued': data.get('issued'), 'fetchedAt': now_iso()}
 
 
 def now_iso():
     return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+def fetch_city(slug, get=get_json):
+    try:
+        data = get(f'{SITE}/api/prevision?ciudad={slug}')
+    except Exception as error:
+        print(f'{slug}: {error}')
+        return None
+    days = (data.get('daily') or {}).get('days')
+    if not data.get('ok') or not days or data.get('stale'):
+        print(f"{slug}: {data.get('reason', 'stale' if data.get('stale') else 'no data')}")
+        return None
+    return {'daily': data['daily'], 'hourly': data.get('hourly'), 'fetchedAt': now_iso()}
 
 
 def is_recent(previous, now):
@@ -69,25 +72,47 @@ def build(slugs, previous, get=get_json, sleep=time.sleep):
     return {'version': 1, 'generatedAt': now_iso(), 'source': 'AEMET OpenData', 'cities': cities}
 
 
+def home_view(forecasts, home_slugs):
+    """The home map only needs the daily summary of its own cities; no extra AEMET requests."""
+    cities = {}
+    for slug in home_slugs:
+        entry = (forecasts.get('cities') or {}).get(slug)
+        days = ((entry or {}).get('daily') or {}).get('days')
+        if not days:
+            continue
+        cities[slug] = {
+            'days': [{key: day.get(key) for key in DAY_KEYS} for day in days],
+            'issued': entry['daily'].get('issued'),
+            'fetchedAt': entry['fetchedAt'],
+        }
+    return {'version': 1, 'generatedAt': forecasts['generatedAt'], 'source': 'AEMET OpenData', 'cities': cities}
+
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')), encoding='utf8')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', default=os.environ.get('RADAR_DATA_DIR', 'data'))
     args = parser.parse_args()
-    target = Path(args.output) / 'home-weather.json'
+    folder = Path(args.output)
     try:
-        previous = json.loads(target.read_text(encoding='utf8'))
+        previous = json.loads((folder / 'forecasts.json').read_text(encoding='utf8'))
     except (OSError, ValueError):
         previous = {}
     if is_recent(previous, datetime.now(timezone.utc)):
         print('Snapshot is recent; nothing to do')
         return
-    slugs = get_json(f'{SITE}/api/mapa-ciudades')['cities']
-    snapshot = build(slugs, previous)
-    if not snapshot['cities']:
+    listing = get_json(f'{SITE}/api/mapa-ciudades')
+    slugs = listing.get('all') or listing['cities']
+    forecasts = build(slugs, previous)
+    if not forecasts['cities']:
         raise SystemExit('No city available')
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(snapshot, ensure_ascii=False, separators=(',', ':')), encoding='utf8')
-    print(f"Snapshot ready: {len(snapshot['cities'])}/{len(slugs)} cities")
+    write(folder / 'forecasts.json', forecasts)
+    write(folder / 'home-weather.json', home_view(forecasts, listing['cities']))
+    print(f"Snapshot ready: {len(forecasts['cities'])}/{len(slugs)} cities")
 
 
 if __name__ == '__main__':
