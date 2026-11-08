@@ -34,17 +34,28 @@ class ForecastSnapshotTest(unittest.TestCase):
         self.assertEqual(entry['hourly'], {'hours': []})
         self.assertTrue(entry['fetchedAt'].endswith('Z'))
 
-    def test_retries_a_failed_city_once_after_a_pause(self):
+    def test_waits_out_the_site_cooldown_and_asks_again_for_the_same_city(self):
         calls, pauses = [], []
 
         def get(url):
             calls.append(url)
             return answer() if len(calls) > 1 else {'ok': False, 'reason': 'unavailable'}
 
-        snapshot = home_snapshot.build(['madrid'], {}, get=get, sleep=pauses.append)
-        self.assertEqual(len(calls), 2)
-        self.assertIn(home_snapshot.RETRY_PAUSE, pauses)
-        self.assertIn('madrid', snapshot['cities'])
+        snapshot = home_snapshot.build(['madrid', 'bilbao'], {}, get=get, sleep=pauses.append)
+        self.assertEqual([c.split('=')[1] for c in calls], ['madrid', 'madrid', 'bilbao'])
+        self.assertEqual(pauses, [home_snapshot.COOLDOWN, home_snapshot.PAUSE])
+        self.assertEqual(set(snapshot['cities']), {'madrid', 'bilbao'})
+
+    def test_gives_up_on_a_city_after_three_attempts(self):
+        calls = []
+        snapshot = home_snapshot.build(['madrid'], {}, get=lambda url: calls.append(url) or {'ok': False}, sleep=lambda _: None)
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(snapshot['cities'], {})
+
+    def test_no_more_retries_once_the_time_budget_is_spent(self):
+        calls, ticks = [], iter([0, 10_000, 10_000, 10_000])
+        home_snapshot.build(['madrid'], {}, get=lambda url: calls.append(url) or {'ok': False}, sleep=lambda _: None, clock=lambda: next(ticks))
+        self.assertEqual(len(calls), 1)
 
     def test_asks_for_cities_one_at_a_time_with_pauses(self):
         pauses = []

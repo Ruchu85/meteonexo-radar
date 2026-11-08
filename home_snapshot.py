@@ -16,7 +16,10 @@ from pathlib import Path
 SITE = os.environ.get('HOME_SITE_URL', 'https://tiempoen.es')
 MIN_AGE = timedelta(minutes=25)
 PAUSE = 5
-RETRY_PAUSE = 35
+# After a 429 the site stops calling AEMET for about 30 seconds: wait that long before asking again.
+COOLDOWN = 35
+# The workflow step stops at 9 minutes; no new retries after this many seconds.
+BUDGET = 8 * 60
 DAY_KEYS = ('date', 'max', 'min', 'sky', 'skyCode', 'rainProbability')
 
 
@@ -51,24 +54,21 @@ def is_recent(previous, now):
     return now - generated < MIN_AGE
 
 
-def build(slugs, previous, get=get_json, sleep=time.sleep):
+def build(slugs, previous, get=get_json, sleep=time.sleep, clock=time.monotonic):
+    started = clock()
     cities = {slug: entry for slug, entry in (previous.get('cities') or {}).items() if slug in slugs}
-    missing = []
     for index, slug in enumerate(slugs):
         if index:
             sleep(PAUSE)
-        entry = fetch_city(slug, get)
-        if entry:
-            cities[slug] = entry
-        else:
-            missing.append(slug)
-    if missing:
-        sleep(RETRY_PAUSE)
-        for slug in missing:
+        for attempt in range(3):
             entry = fetch_city(slug, get)
             if entry:
                 cities[slug] = entry
-            sleep(PAUSE)
+                break
+            if attempt < 2 and clock() - started < BUDGET:
+                sleep(COOLDOWN)
+            else:
+                break
     return {'version': 1, 'generatedAt': now_iso(), 'source': 'AEMET OpenData', 'cities': cities}
 
 
