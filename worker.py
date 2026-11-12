@@ -56,6 +56,9 @@ def session():
     s.mount('https://',HTTPAdapter(max_retries=retry))
     return s
 
+class SourceEmpty(RuntimeError):
+    """The upstream bucket has no recent composites: an outage there, not a fault of this worker."""
+
 def request_bytes(s,url,*,limit=MAX_FILE,params=None):
     # Every upstream URL is constructed here; no client-supplied fetch/proxy URLs.
     parsed=urlparse(url)
@@ -413,7 +416,7 @@ def cycle(args,s):
     else:
         available=discover(s,now,args.history)
         items=select_frames(available,args.max_frames,args.history)
-        if not items:raise RuntimeError('No recent OPERA DBZH composites returned by source')
+        if not items:raise SourceEmpty('No recent OPERA DBZH composites returned by source')
         sat=Satellite(s,out,frame_size()) if getattr(args,'clouds',True) else None
         def obtain(stamp,key):
             fid=stamp.strftime('%Y%m%dT%H%M%SZ');cache=out/'frames'/f'{fid}.json'
@@ -481,6 +484,11 @@ def main():
         while True:
             started=time.monotonic()
             try:cycle(args,s);exit_code=0
+            except SourceEmpty as exc:
+                # Upstream outage: keep the last good manifest, say so plainly, and do not turn the whole run red.
+                LOG.warning('%s; last good manifest preserved.',exc)
+                atomic_json(out/'health.json',{'ok':False,'checkedAt':iso(utcnow()),'error':'SourceEmpty'})
+                exit_code=0
             except Exception as exc:
                 LOG.error('Radar cycle failed (%s). Last good manifest preserved.',type(exc).__name__)
                 atomic_json(out/'health.json',{'ok':False,'checkedAt':iso(utcnow()),'error':type(exc).__name__})

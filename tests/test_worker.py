@@ -91,7 +91,7 @@ class RadarWorkerTests(unittest.TestCase):
         output=self.root/'out';output.mkdir();previous=b'{"lastGood":true}';(output/'manifest.json').write_bytes(previous)
         args=SimpleNamespace(output=str(output),public_base='/radar-data',bucket='',prefix='radar',input=None,history=120,max_frames=13)
         with patch.object(w,'discover',return_value=[]):
-            with self.assertRaises(RuntimeError):w.cycle(args,None)
+            with self.assertRaises(w.SourceEmpty):w.cycle(args,None)
         self.assertEqual((output/'manifest.json').read_bytes(),previous)
     def test_atomic_publication_and_cleanup(self):
         p=self.root/'manifest.json';w.atomic_json(p,{'ok':1});self.assertEqual(json.loads(p.read_text()),{'ok':1})
