@@ -44,12 +44,15 @@ jobs:
       # Forecast maps: only does work when DWD has published a new complete ICON-EU run.
       # A failure here never blocks the radar publication.
       - name: Pronostico ICON-EU
+        if: ${{ !cancelled() }}
         continue-on-error: true
         timeout-minutes: 9
         run: python model.py
       # Forecasts of the indexable TiempoEn cities and of the home map, about every 30 minutes
       # (54 cities, one every 5 s so that AEMET does not answer 429). Never blocks the radar publication.
+      # It runs even when the OPERA step failed: the site must not lose its forecasts because the radar source is down.
       - name: Prevision de ciudades y portada
+        if: ${{ !cancelled() }}
         continue-on-error: true
         timeout-minutes: 9
         run: python home_snapshot.py
@@ -58,11 +61,15 @@ jobs:
         with:
           path: data
           key: radar-${{ github.run_id }}-${{ github.run_attempt }}
-      - run: python scripts/build_site.py data site
-      - uses: actions/upload-pages-artifact@v3
+      # Publish whatever is good even if the OPERA step failed (the last good radar manifest is preserved).
+      - if: ${{ !cancelled() }}
+        run: python scripts/build_site.py data site
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-pages-artifact@v3
         with:
           path: site
       - id: deploy
+        if: ${{ !cancelled() }}
         uses: actions/deploy-pages@v4
   # Primary trigger. GitHub scheduled workflows are unreliable on young repos (the first
   # cron never fired in 80 minutes), so every run schedules the next one itself.
