@@ -85,5 +85,38 @@ class ForecastSnapshotTest(unittest.TestCase):
         self.assertFalse(home_snapshot.is_recent({}, now))
 
 
+class DirectAemetTest(unittest.TestCase):
+    def test_uses_aemet_directly_and_never_asks_the_site(self):
+        site = []
+        snapshot = home_snapshot.build(['madrid'], {}, get=lambda url: site.append(url) or answer(), sleep=lambda _: None, direct=lambda slug: answer('direct'))
+        self.assertEqual(site, [])
+        self.assertEqual(snapshot['cities']['madrid']['daily']['days'][0]['date'], 'direct')
+
+    def test_429_from_aemet_waits_and_does_not_fall_back_to_the_site(self):
+        site, pauses, calls = [], [], []
+
+        def direct(slug):
+            calls.append(slug)
+            if len(calls) == 1:
+                raise home_snapshot.aemet.Busy()
+            return answer('direct')
+
+        snapshot = home_snapshot.build(['madrid'], {}, get=lambda url: site.append(url) or answer(), sleep=pauses.append, direct=direct)
+        self.assertEqual(site, [])
+        self.assertEqual(pauses, [home_snapshot.COOLDOWN])
+        self.assertEqual(snapshot['cities']['madrid']['daily']['days'][0]['date'], 'direct')
+
+    def test_other_aemet_errors_fall_back_to_the_site(self):
+        def direct(slug):
+            raise RuntimeError('AEMET service error')
+
+        snapshot = home_snapshot.build(['madrid'], {}, get=lambda url: answer('site'), sleep=lambda _: None, direct=direct)
+        self.assertEqual(snapshot['cities']['madrid']['daily']['days'][0]['date'], 'site')
+
+    def test_a_city_without_a_known_code_goes_through_the_site(self):
+        snapshot = home_snapshot.build(['madrid'], {}, get=lambda url: answer('site'), sleep=lambda _: None, direct=lambda slug: None)
+        self.assertEqual(snapshot['cities']['madrid']['daily']['days'][0]['date'], 'site')
+
+
 if __name__ == '__main__':
     unittest.main()

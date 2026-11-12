@@ -13,6 +13,8 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import aemet
+
 SITE = os.environ.get('HOME_SITE_URL', 'https://tiempoen.es')
 MIN_AGE = timedelta(minutes=25)
 PAUSE = 5
@@ -33,12 +35,23 @@ def now_iso():
     return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-def fetch_city(slug, get=get_json):
-    try:
-        data = get(f'{SITE}/api/prevision?ciudad={slug}')
-    except Exception as error:
-        print(f'{slug}: {error}')
-        return None
+def fetch_city(slug, get=get_json, direct=None):
+    """direct (optional) asks AEMET itself; when it fails for any reason other than 429, the site is asked."""
+    data = None
+    if direct:
+        try:
+            data = direct(slug)
+        except aemet.Busy:
+            print(f'{slug}: AEMET busy (429)')
+            return None
+        except Exception as error:
+            print(f'{slug}: direct AEMET failed ({type(error).__name__}); asking the site')
+    if data is None:
+        try:
+            data = get(f'{SITE}/api/prevision?ciudad={slug}')
+        except Exception as error:
+            print(f'{slug}: {error}')
+            return None
     days = (data.get('daily') or {}).get('days')
     if not data.get('ok') or not days or data.get('stale'):
         print(f"{slug}: {data.get('reason', 'stale' if data.get('stale') else 'no data')}")
@@ -54,14 +67,14 @@ def is_recent(previous, now):
     return now - generated < MIN_AGE
 
 
-def build(slugs, previous, get=get_json, sleep=time.sleep, clock=time.monotonic):
+def build(slugs, previous, get=get_json, sleep=time.sleep, clock=time.monotonic, direct=None):
     started = clock()
     cities = {slug: entry for slug, entry in (previous.get('cities') or {}).items() if slug in slugs}
     for index, slug in enumerate(slugs):
         if index:
             sleep(PAUSE)
         for attempt in range(3):
-            entry = fetch_city(slug, get)
+            entry = fetch_city(slug, get, direct)
             if entry:
                 cities[slug] = entry
                 break
@@ -107,7 +120,13 @@ def main():
         return
     listing = get_json(f'{SITE}/api/mapa-ciudades')
     slugs = listing.get('all') or listing['cities']
-    forecasts = build(slugs, previous)
+    direct = None
+    key = os.environ.get('AEMET_API_KEY', '').strip()
+    ids = listing.get('ids') or {}
+    if key and ids:
+        print('Asking AEMET directly (key from the repository secret)')
+        direct = lambda slug: aemet.forecast(ids[slug], key) if slug in ids else None
+    forecasts = build(slugs, previous, direct=direct)
     if not forecasts['cities']:
         raise SystemExit('No city available')
     write(folder / 'forecasts.json', forecasts)

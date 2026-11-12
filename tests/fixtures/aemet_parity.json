@@ -1,0 +1,2500 @@
+{
+ "id": "28079",
+ "rawDaily": [
+  {
+   "id": "-17516",
+   "elaborado": "2026-11-12T08:20:00",
+   "origen": {
+    "productor": "Agencia Estatal de Meteorología - AEMET. Gobierno de España"
+   },
+   "prediccion": {
+    "dia": [
+     {
+      "fecha": "2026-11-12T00:00:00",
+      "probPrecipitacion": [
+       {
+        "value": 0,
+        "periodo": "00-24"
+       },
+       {
+        "value": 5,
+        "periodo": "00-12"
+       },
+       {
+        "value": "",
+        "periodo": "12-24"
+       }
+      ],
+      "cotaNieveProv": [
+       {
+        "value": "1200",
+        "periodo": "00-24"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "value": "12",
+        "periodo": "00-24",
+        "descripcion": "Poco nuboso"
+       },
+       {
+        "periodo": "00-06",
+        "value": "11",
+        "descripcion": "S0"
+       },
+       {
+        "periodo": "06-12",
+        "value": "12",
+        "descripcion": "S1"
+       },
+       {
+        "periodo": "12-18",
+        "value": "13",
+        "descripcion": "S2"
+       },
+       {
+        "periodo": "18-24",
+        "value": "14",
+        "descripcion": "S3"
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "00-24",
+        "direccion": "NE",
+        "velocidad": 12
+       },
+       {
+        "periodo": "00-06",
+        "direccion": "N",
+        "velocidad": [
+         8
+        ]
+       },
+       {
+        "periodo": "06-12",
+        "direccion": "",
+        "velocidad": "10"
+       },
+       {
+        "periodo": "12-18",
+        "direccion": [
+         "SO"
+        ],
+        "velocidad": 15
+       },
+       {
+        "periodo": "18-24",
+        "direccion": "C",
+        "velocidad": 0
+       }
+      ],
+      "rachaMax": [
+       {
+        "value": "30",
+        "periodo": "00-24"
+       },
+       {
+        "value": "25",
+        "periodo": "00-06"
+       },
+       {
+        "value": "",
+        "periodo": "06-12"
+       }
+      ],
+      "temperatura": {
+       "maxima": 20,
+       "minima": "9,5",
+       "dato": []
+      },
+      "sensTermica": {
+       "maxima": 18,
+       "minima": 7
+      },
+      "humedadRelativa": {
+       "maxima": 90,
+       "minima": "Ip"
+      },
+      "uvMax": 5
+     },
+     {
+      "fecha": "2026-11-13T00:00:00",
+      "probPrecipitacion": [
+       {
+        "value": 10,
+        "periodo": "00-24"
+       },
+       {
+        "value": 5,
+        "periodo": "00-12"
+       },
+       {
+        "value": "",
+        "periodo": "12-24"
+       }
+      ],
+      "cotaNieveProv": [
+       {
+        "value": "1200",
+        "periodo": "00-24"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "value": "12",
+        "periodo": "00-24",
+        "descripcion": "Poco nuboso"
+       },
+       {
+        "periodo": "00-06",
+        "value": "11",
+        "descripcion": "S0"
+       },
+       {
+        "periodo": "06-12",
+        "value": "12",
+        "descripcion": "S1"
+       },
+       {
+        "periodo": "12-18",
+        "value": "13",
+        "descripcion": "S2"
+       },
+       {
+        "periodo": "18-24",
+        "value": "14",
+        "descripcion": "S3"
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "00-24",
+        "direccion": "NE",
+        "velocidad": 12
+       },
+       {
+        "periodo": "00-06",
+        "direccion": "N",
+        "velocidad": [
+         8
+        ]
+       },
+       {
+        "periodo": "06-12",
+        "direccion": "",
+        "velocidad": "10"
+       },
+       {
+        "periodo": "12-18",
+        "direccion": [
+         "SO"
+        ],
+        "velocidad": 15
+       },
+       {
+        "periodo": "18-24",
+        "direccion": "C",
+        "velocidad": 0
+       }
+      ],
+      "rachaMax": [
+       {
+        "value": "30",
+        "periodo": "00-24"
+       },
+       {
+        "value": "25",
+        "periodo": "00-06"
+       },
+       {
+        "value": "",
+        "periodo": "06-12"
+       }
+      ],
+      "temperatura": {
+       "maxima": 21,
+       "minima": "9,5",
+       "dato": []
+      },
+      "sensTermica": {
+       "maxima": 19,
+       "minima": 7
+      },
+      "humedadRelativa": {
+       "maxima": 90,
+       "minima": "Ip"
+      },
+      "uvMax": 5
+     },
+     {
+      "fecha": "2026-11-14T00:00:00",
+      "probPrecipitacion": [
+       {
+        "value": 20,
+        "periodo": "00-24"
+       },
+       {
+        "value": 5,
+        "periodo": "00-12"
+       },
+       {
+        "value": "",
+        "periodo": "12-24"
+       }
+      ],
+      "cotaNieveProv": [
+       {
+        "value": "1200",
+        "periodo": "00-24"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "value": "12",
+        "periodo": "00-24",
+        "descripcion": "Poco nuboso"
+       },
+       {
+        "periodo": "00-06",
+        "value": "11",
+        "descripcion": "S0"
+       },
+       {
+        "periodo": "06-12",
+        "value": "12",
+        "descripcion": "S1"
+       },
+       {
+        "periodo": "12-18",
+        "value": "13",
+        "descripcion": "S2"
+       },
+       {
+        "periodo": "18-24",
+        "value": "14",
+        "descripcion": "S3"
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "00-24",
+        "direccion": "NE",
+        "velocidad": 12
+       },
+       {
+        "periodo": "00-06",
+        "direccion": "N",
+        "velocidad": [
+         8
+        ]
+       },
+       {
+        "periodo": "06-12",
+        "direccion": "",
+        "velocidad": "10"
+       },
+       {
+        "periodo": "12-18",
+        "direccion": [
+         "SO"
+        ],
+        "velocidad": 15
+       },
+       {
+        "periodo": "18-24",
+        "direccion": "C",
+        "velocidad": 0
+       }
+      ],
+      "rachaMax": [
+       {
+        "value": "30",
+        "periodo": "00-24"
+       },
+       {
+        "value": "25",
+        "periodo": "00-06"
+       },
+       {
+        "value": "",
+        "periodo": "06-12"
+       }
+      ],
+      "temperatura": {
+       "maxima": 22,
+       "minima": "9,5",
+       "dato": []
+      },
+      "sensTermica": {
+       "maxima": 20,
+       "minima": 7
+      },
+      "humedadRelativa": {
+       "maxima": 90,
+       "minima": "Ip"
+      }
+     },
+     {
+      "fecha": "2026-11-15T00:00:00",
+      "probPrecipitacion": [
+       {
+        "value": 30,
+        "periodo": "00-24"
+       },
+       {
+        "value": 5,
+        "periodo": "00-12"
+       },
+       {
+        "value": "",
+        "periodo": "12-24"
+       }
+      ],
+      "cotaNieveProv": [
+       {
+        "value": "1200",
+        "periodo": "00-24"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "value": "43",
+        "periodo": "00-24",
+        "descripcion": "Nuboso con lluvia escasa"
+       },
+       {
+        "value": "11",
+        "periodo": "00-12",
+        "descripcion": "Despejado"
+       },
+       {
+        "value": "15",
+        "periodo": "12-24",
+        "descripcion": "Muy nuboso"
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "00-24",
+        "direccion": "NE",
+        "velocidad": 12
+       },
+       {
+        "periodo": "00-06",
+        "direccion": "N",
+        "velocidad": [
+         8
+        ]
+       },
+       {
+        "periodo": "06-12",
+        "direccion": "",
+        "velocidad": "10"
+       },
+       {
+        "periodo": "12-18",
+        "direccion": [
+         "SO"
+        ],
+        "velocidad": 15
+       },
+       {
+        "periodo": "18-24",
+        "direccion": "C",
+        "velocidad": 0
+       }
+      ],
+      "rachaMax": [
+       {
+        "value": "30",
+        "periodo": "00-24"
+       },
+       {
+        "value": "25",
+        "periodo": "00-06"
+       },
+       {
+        "value": "",
+        "periodo": "06-12"
+       }
+      ],
+      "temperatura": {
+       "maxima": 23,
+       "minima": "9,5",
+       "dato": []
+      },
+      "sensTermica": {
+       "maxima": 21,
+       "minima": 7
+      },
+      "humedadRelativa": {
+       "maxima": 90,
+       "minima": "Ip"
+      }
+     },
+     {
+      "fecha": "2026-11-16T00:00:00",
+      "probPrecipitacion": [
+       {
+        "value": 40,
+        "periodo": "00-24"
+       },
+       {
+        "value": 5,
+        "periodo": "00-12"
+       },
+       {
+        "value": "",
+        "periodo": "12-24"
+       }
+      ],
+      "cotaNieveProv": [
+       {
+        "value": "1200",
+        "periodo": "00-24"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "value": "43",
+        "periodo": "00-24",
+        "descripcion": "Nuboso con lluvia escasa"
+       },
+       {
+        "value": "11",
+        "periodo": "00-12",
+        "descripcion": "Despejado"
+       },
+       {
+        "value": "15",
+        "periodo": "12-24",
+        "descripcion": "Muy nuboso"
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "00-24",
+        "direccion": "NE",
+        "velocidad": 12
+       },
+       {
+        "periodo": "00-06",
+        "direccion": "N",
+        "velocidad": [
+         8
+        ]
+       },
+       {
+        "periodo": "06-12",
+        "direccion": "",
+        "velocidad": "10"
+       },
+       {
+        "periodo": "12-18",
+        "direccion": [
+         "SO"
+        ],
+        "velocidad": 15
+       },
+       {
+        "periodo": "18-24",
+        "direccion": "C",
+        "velocidad": 0
+       }
+      ],
+      "rachaMax": [
+       {
+        "value": "30",
+        "periodo": "00-24"
+       },
+       {
+        "value": "25",
+        "periodo": "00-06"
+       },
+       {
+        "value": "",
+        "periodo": "06-12"
+       }
+      ],
+      "temperatura": {
+       "maxima": 24,
+       "minima": "9,5",
+       "dato": []
+      },
+      "sensTermica": {
+       "maxima": 22,
+       "minima": 7
+      },
+      "humedadRelativa": {
+       "maxima": 90,
+       "minima": "Ip"
+      }
+     },
+     {
+      "fecha": "2026-11-17T00:00:00",
+      "probPrecipitacion": [
+       {
+        "value": 50,
+        "periodo": "00-24"
+       },
+       {
+        "value": 5,
+        "periodo": "00-12"
+       },
+       {
+        "value": "",
+        "periodo": "12-24"
+       }
+      ],
+      "cotaNieveProv": [
+       {
+        "value": "1200",
+        "periodo": "00-24"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "value": "14",
+        "periodo": "00-24",
+        "descripcion": "Intervalos nubosos"
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "00-24",
+        "direccion": "NE",
+        "velocidad": 12
+       },
+       {
+        "periodo": "00-06",
+        "direccion": "N",
+        "velocidad": [
+         8
+        ]
+       },
+       {
+        "periodo": "06-12",
+        "direccion": "",
+        "velocidad": "10"
+       },
+       {
+        "periodo": "12-18",
+        "direccion": [
+         "SO"
+        ],
+        "velocidad": 15
+       },
+       {
+        "periodo": "18-24",
+        "direccion": "C",
+        "velocidad": 0
+       }
+      ],
+      "rachaMax": [
+       {
+        "value": "30",
+        "periodo": "00-24"
+       },
+       {
+        "value": "25",
+        "periodo": "00-06"
+       },
+       {
+        "value": "",
+        "periodo": "06-12"
+       }
+      ],
+      "temperatura": {
+       "maxima": 25,
+       "minima": "9,5",
+       "dato": []
+      },
+      "sensTermica": {
+       "maxima": 23,
+       "minima": 7
+      },
+      "humedadRelativa": {
+       "maxima": 90,
+       "minima": "Ip"
+      }
+     },
+     {
+      "fecha": "2026-11-18T00:00:00",
+      "probPrecipitacion": [
+       {
+        "value": 60,
+        "periodo": "00-24"
+       },
+       {
+        "value": 5,
+        "periodo": "00-12"
+       },
+       {
+        "value": "",
+        "periodo": "12-24"
+       }
+      ],
+      "cotaNieveProv": [
+       {
+        "value": "1200",
+        "periodo": "00-24"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "value": "14",
+        "periodo": "00-24",
+        "descripcion": "Intervalos nubosos"
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "00-24",
+        "direccion": "NE",
+        "velocidad": 12
+       },
+       {
+        "periodo": "00-06",
+        "direccion": "N",
+        "velocidad": [
+         8
+        ]
+       },
+       {
+        "periodo": "06-12",
+        "direccion": "",
+        "velocidad": "10"
+       },
+       {
+        "periodo": "12-18",
+        "direccion": [
+         "SO"
+        ],
+        "velocidad": 15
+       },
+       {
+        "periodo": "18-24",
+        "direccion": "C",
+        "velocidad": 0
+       }
+      ],
+      "rachaMax": [
+       {
+        "value": "30",
+        "periodo": "00-24"
+       },
+       {
+        "value": "25",
+        "periodo": "00-06"
+       },
+       {
+        "value": "",
+        "periodo": "06-12"
+       }
+      ],
+      "temperatura": {
+       "maxima": 26,
+       "minima": "9,5",
+       "dato": []
+      },
+      "sensTermica": {
+       "maxima": 24,
+       "minima": 7
+      },
+      "humedadRelativa": {
+       "maxima": 90,
+       "minima": "Ip"
+      }
+     },
+     {
+      "fecha": "bad",
+      "temperatura": {}
+     }
+    ]
+   }
+  }
+ ],
+ "rawHourly": [
+  {
+   "id": "28079",
+   "elaborado": "2026-11-12T08:25:00",
+   "origen": {
+    "productor": "AEMET"
+   },
+   "prediccion": {
+    "dia": [
+     {
+      "fecha": "2026-11-12T00:00:00",
+      "orto": "07:48",
+      "ocaso": "bad",
+      "temperatura": [
+       {
+        "periodo": "00",
+        "value": "10"
+       },
+       {
+        "periodo": "01",
+        "value": "11"
+       },
+       {
+        "periodo": "02",
+        "value": "12"
+       },
+       {
+        "periodo": "03",
+        "value": "13"
+       },
+       {
+        "periodo": "04",
+        "value": "14"
+       },
+       {
+        "periodo": "05",
+        "value": "15"
+       },
+       {
+        "periodo": "06",
+        "value": "16"
+       },
+       {
+        "periodo": "07",
+        "value": "10"
+       },
+       {
+        "periodo": "08",
+        "value": "11"
+       },
+       {
+        "periodo": "09",
+        "value": "12"
+       },
+       {
+        "periodo": "10",
+        "value": "13"
+       },
+       {
+        "periodo": "11",
+        "value": "14"
+       },
+       {
+        "periodo": "12",
+        "value": "15"
+       },
+       {
+        "periodo": "13",
+        "value": "16"
+       },
+       {
+        "periodo": "14",
+        "value": "10"
+       },
+       {
+        "periodo": "15",
+        "value": "11"
+       },
+       {
+        "periodo": "16",
+        "value": "12"
+       },
+       {
+        "periodo": "17",
+        "value": "13"
+       },
+       {
+        "periodo": "18",
+        "value": "14"
+       },
+       {
+        "periodo": "19",
+        "value": "15"
+       },
+       {
+        "periodo": "20",
+        "value": "16"
+       },
+       {
+        "periodo": "21",
+        "value": "10"
+       },
+       {
+        "periodo": "22",
+        "value": "11"
+       },
+       {
+        "periodo": "23",
+        "value": "12"
+       }
+      ],
+      "sensTermica": [
+       {
+        "periodo": "09",
+        "value": "8"
+       },
+       {
+        "periodo": "10",
+        "value": ""
+       }
+      ],
+      "probPrecipitacion": [
+       {
+        "value": "20",
+        "periodo": "0107"
+       },
+       {
+        "value": "40",
+        "periodo": "0713"
+       },
+       {
+        "value": "60",
+        "periodo": "1319"
+       },
+       {
+        "value": "80",
+        "periodo": "1901"
+       },
+       {
+        "value": "x",
+        "periodo": "0102"
+       },
+       {
+        "value": "5",
+        "periodo": "0224"
+       }
+      ],
+      "precipitacion": [
+       {
+        "periodo": "10",
+        "value": "0,1"
+       },
+       {
+        "periodo": "11",
+        "value": "Ip"
+       },
+       {
+        "periodo": "12",
+        "value": "0.0"
+       }
+      ],
+      "humedadRelativa": [
+       {
+        "periodo": "10",
+        "value": "70"
+       },
+       {
+        "periodo": "11",
+        "value": "-"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "periodo": "09",
+        "value": "11n",
+        "descripcion": "Despejado"
+       },
+       {
+        "periodo": "10",
+        "value": "12"
+       },
+       {
+        "periodo": "7",
+        "value": "13",
+        "descripcion": "Nuboso"
+       },
+       {
+        "periodo": "25",
+        "value": "99",
+        "descripcion": "fuera"
+       }
+      ],
+      "vientoAndRachaMax": [
+       {
+        "periodo": "10",
+        "direccion": [
+         "N"
+        ],
+        "velocidad": [
+         11
+        ]
+       },
+       {
+        "periodo": "10",
+        "value": [
+         "25"
+        ]
+       },
+       {
+        "periodo": "11",
+        "velocidad": [
+         "13"
+        ]
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "11",
+        "direccion": "O",
+        "velocidad": 14
+       },
+       {
+        "periodo": "12",
+        "velocidad": "9"
+       }
+      ]
+     },
+     {
+      "fecha": "2026-11-13T00:00:00",
+      "orto": "07:48",
+      "ocaso": "18:23",
+      "temperatura": [
+       {
+        "periodo": "00",
+        "value": "11"
+       },
+       {
+        "periodo": "01",
+        "value": "12"
+       },
+       {
+        "periodo": "02",
+        "value": "13"
+       },
+       {
+        "periodo": "03",
+        "value": "14"
+       },
+       {
+        "periodo": "04",
+        "value": "15"
+       },
+       {
+        "periodo": "05",
+        "value": "16"
+       },
+       {
+        "periodo": "06",
+        "value": "17"
+       },
+       {
+        "periodo": "07",
+        "value": "11"
+       },
+       {
+        "periodo": "08",
+        "value": "12"
+       },
+       {
+        "periodo": "09",
+        "value": "13"
+       },
+       {
+        "periodo": "10",
+        "value": "14"
+       },
+       {
+        "periodo": "11",
+        "value": "15"
+       },
+       {
+        "periodo": "12",
+        "value": "16"
+       },
+       {
+        "periodo": "13",
+        "value": "17"
+       },
+       {
+        "periodo": "14",
+        "value": "11"
+       },
+       {
+        "periodo": "15",
+        "value": "12"
+       },
+       {
+        "periodo": "16",
+        "value": "13"
+       },
+       {
+        "periodo": "17",
+        "value": "14"
+       },
+       {
+        "periodo": "18",
+        "value": "15"
+       },
+       {
+        "periodo": "19",
+        "value": "16"
+       },
+       {
+        "periodo": "20",
+        "value": "17"
+       },
+       {
+        "periodo": "21",
+        "value": "11"
+       },
+       {
+        "periodo": "22",
+        "value": "12"
+       },
+       {
+        "periodo": "23",
+        "value": "13"
+       }
+      ],
+      "sensTermica": [
+       {
+        "periodo": "09",
+        "value": "8"
+       },
+       {
+        "periodo": "10",
+        "value": ""
+       }
+      ],
+      "probPrecipitacion": [
+       {
+        "value": "20",
+        "periodo": "0107"
+       },
+       {
+        "value": "40",
+        "periodo": "0713"
+       },
+       {
+        "value": "60",
+        "periodo": "1319"
+       },
+       {
+        "value": "80",
+        "periodo": "1901"
+       },
+       {
+        "value": "x",
+        "periodo": "0102"
+       },
+       {
+        "value": "5",
+        "periodo": "0224"
+       }
+      ],
+      "precipitacion": [
+       {
+        "periodo": "10",
+        "value": "0,1"
+       },
+       {
+        "periodo": "11",
+        "value": "Ip"
+       },
+       {
+        "periodo": "12",
+        "value": "0.0"
+       }
+      ],
+      "humedadRelativa": [
+       {
+        "periodo": "10",
+        "value": "70"
+       },
+       {
+        "periodo": "11",
+        "value": "-"
+       }
+      ],
+      "estadoCielo": [
+       {
+        "periodo": "09",
+        "value": "11n",
+        "descripcion": "Despejado"
+       },
+       {
+        "periodo": "10",
+        "value": "12"
+       },
+       {
+        "periodo": "7",
+        "value": "13",
+        "descripcion": "Nuboso"
+       },
+       {
+        "periodo": "25",
+        "value": "99",
+        "descripcion": "fuera"
+       }
+      ],
+      "vientoAndRachaMax": [
+       {
+        "periodo": "10",
+        "direccion": [
+         "N"
+        ],
+        "velocidad": [
+         11
+        ]
+       },
+       {
+        "periodo": "10",
+        "value": [
+         "25"
+        ]
+       },
+       {
+        "periodo": "11",
+        "velocidad": [
+         "13"
+        ]
+       }
+      ],
+      "viento": [
+       {
+        "periodo": "11",
+        "direccion": "O",
+        "velocidad": 14
+       },
+       {
+        "periodo": "12",
+        "velocidad": "9"
+       }
+      ]
+     },
+     {
+      "fecha": "zzz"
+     }
+    ]
+   }
+  }
+ ],
+ "daily": {
+  "days": [
+   {
+    "date": "2026-11-12",
+    "max": 20,
+    "min": 9.5,
+    "sky": "Poco nuboso",
+    "skyCode": "12",
+    "rainProbability": 0,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "humidityMin": null,
+    "humidityMax": 90,
+    "uv": 5,
+    "snow": "1200",
+    "feelsMax": 18,
+    "feelsMin": 7,
+    "gust": 30,
+    "periods": [
+     {
+      "period": "00-06",
+      "sky": "S0",
+      "skyCode": "11",
+      "rainProbability": null,
+      "windSpeed": 8,
+      "windDirection": "N",
+      "gust": 25
+     },
+     {
+      "period": "06-12",
+      "sky": "S1",
+      "skyCode": "12",
+      "rainProbability": null,
+      "windSpeed": 10,
+      "windDirection": null,
+      "gust": null
+     },
+     {
+      "period": "12-18",
+      "sky": "S2",
+      "skyCode": "13",
+      "rainProbability": null,
+      "windSpeed": 15,
+      "windDirection": "SO",
+      "gust": null
+     },
+     {
+      "period": "18-24",
+      "sky": "S3",
+      "skyCode": "14",
+      "rainProbability": null,
+      "windSpeed": 0,
+      "windDirection": "C",
+      "gust": null
+     }
+    ]
+   },
+   {
+    "date": "2026-11-13",
+    "max": 21,
+    "min": 9.5,
+    "sky": "Poco nuboso",
+    "skyCode": "12",
+    "rainProbability": 10,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "humidityMin": null,
+    "humidityMax": 90,
+    "uv": 5,
+    "snow": "1200",
+    "feelsMax": 19,
+    "feelsMin": 7,
+    "gust": 30,
+    "periods": [
+     {
+      "period": "00-06",
+      "sky": "S0",
+      "skyCode": "11",
+      "rainProbability": null,
+      "windSpeed": 8,
+      "windDirection": "N",
+      "gust": 25
+     },
+     {
+      "period": "06-12",
+      "sky": "S1",
+      "skyCode": "12",
+      "rainProbability": null,
+      "windSpeed": 10,
+      "windDirection": null,
+      "gust": null
+     },
+     {
+      "period": "12-18",
+      "sky": "S2",
+      "skyCode": "13",
+      "rainProbability": null,
+      "windSpeed": 15,
+      "windDirection": "SO",
+      "gust": null
+     },
+     {
+      "period": "18-24",
+      "sky": "S3",
+      "skyCode": "14",
+      "rainProbability": null,
+      "windSpeed": 0,
+      "windDirection": "C",
+      "gust": null
+     }
+    ]
+   },
+   {
+    "date": "2026-11-14",
+    "max": 22,
+    "min": 9.5,
+    "sky": "Poco nuboso",
+    "skyCode": "12",
+    "rainProbability": 20,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "humidityMin": null,
+    "humidityMax": 90,
+    "uv": null,
+    "snow": "1200",
+    "feelsMax": 20,
+    "feelsMin": 7,
+    "gust": 30,
+    "periods": [
+     {
+      "period": "00-06",
+      "sky": "S0",
+      "skyCode": "11",
+      "rainProbability": null,
+      "windSpeed": 8,
+      "windDirection": "N",
+      "gust": 25
+     },
+     {
+      "period": "06-12",
+      "sky": "S1",
+      "skyCode": "12",
+      "rainProbability": null,
+      "windSpeed": 10,
+      "windDirection": null,
+      "gust": null
+     },
+     {
+      "period": "12-18",
+      "sky": "S2",
+      "skyCode": "13",
+      "rainProbability": null,
+      "windSpeed": 15,
+      "windDirection": "SO",
+      "gust": null
+     },
+     {
+      "period": "18-24",
+      "sky": "S3",
+      "skyCode": "14",
+      "rainProbability": null,
+      "windSpeed": 0,
+      "windDirection": "C",
+      "gust": null
+     }
+    ]
+   },
+   {
+    "date": "2026-11-15",
+    "max": 23,
+    "min": 9.5,
+    "sky": "Nuboso con lluvia escasa",
+    "skyCode": "43",
+    "rainProbability": 30,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "humidityMin": null,
+    "humidityMax": 90,
+    "uv": null,
+    "snow": "1200",
+    "feelsMax": 21,
+    "feelsMin": 7,
+    "gust": 30,
+    "periods": [
+     {
+      "period": "00-12",
+      "sky": "Despejado",
+      "skyCode": "11",
+      "rainProbability": 5,
+      "windSpeed": null,
+      "windDirection": null,
+      "gust": null
+     },
+     {
+      "period": "12-24",
+      "sky": "Muy nuboso",
+      "skyCode": "15",
+      "rainProbability": null,
+      "windSpeed": null,
+      "windDirection": null,
+      "gust": null
+     }
+    ]
+   },
+   {
+    "date": "2026-11-16",
+    "max": 24,
+    "min": 9.5,
+    "sky": "Nuboso con lluvia escasa",
+    "skyCode": "43",
+    "rainProbability": 40,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "humidityMin": null,
+    "humidityMax": 90,
+    "uv": null,
+    "snow": "1200",
+    "feelsMax": 22,
+    "feelsMin": 7,
+    "gust": 30,
+    "periods": [
+     {
+      "period": "00-12",
+      "sky": "Despejado",
+      "skyCode": "11",
+      "rainProbability": 5,
+      "windSpeed": null,
+      "windDirection": null,
+      "gust": null
+     },
+     {
+      "period": "12-24",
+      "sky": "Muy nuboso",
+      "skyCode": "15",
+      "rainProbability": null,
+      "windSpeed": null,
+      "windDirection": null,
+      "gust": null
+     }
+    ]
+   },
+   {
+    "date": "2026-11-17",
+    "max": 25,
+    "min": 9.5,
+    "sky": "Intervalos nubosos",
+    "skyCode": "14",
+    "rainProbability": 50,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "humidityMin": null,
+    "humidityMax": 90,
+    "uv": null,
+    "snow": "1200",
+    "feelsMax": 23,
+    "feelsMin": 7,
+    "gust": 30,
+    "periods": []
+   },
+   {
+    "date": "2026-11-18",
+    "max": 26,
+    "min": 9.5,
+    "sky": "Intervalos nubosos",
+    "skyCode": "14",
+    "rainProbability": 60,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "humidityMin": null,
+    "humidityMax": 90,
+    "uv": null,
+    "snow": "1200",
+    "feelsMax": 24,
+    "feelsMin": 7,
+    "gust": 30,
+    "periods": []
+   }
+  ],
+  "issued": "2026-11-12T08:20:00",
+  "source": "Agencia Estatal de Meteorología - AEMET. Gobierno de España"
+ },
+ "hourly": {
+  "hours": [
+   {
+    "date": "2026-11-12",
+    "time": "00:00",
+    "temp": 10
+   },
+   {
+    "date": "2026-11-12",
+    "time": "01:00",
+    "temp": 11,
+    "rainProbability": 20
+   },
+   {
+    "date": "2026-11-12",
+    "time": "02:00",
+    "temp": 12,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "03:00",
+    "temp": 13,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "04:00",
+    "temp": 14,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "05:00",
+    "temp": 15,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "06:00",
+    "temp": 16,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "07:00",
+    "temp": 10,
+    "rainProbability": 5,
+    "sky": "Nuboso",
+    "skyCode": "13"
+   },
+   {
+    "date": "2026-11-12",
+    "time": "08:00",
+    "temp": 11,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "09:00",
+    "temp": 12,
+    "feelsLike": 8,
+    "rainProbability": 5,
+    "sky": "Despejado",
+    "skyCode": "11n"
+   },
+   {
+    "date": "2026-11-12",
+    "time": "10:00",
+    "temp": 13,
+    "feelsLike": null,
+    "rainProbability": 5,
+    "rainMm": 0.1,
+    "humidity": 70,
+    "sky": "",
+    "skyCode": "12",
+    "windSpeed": 11
+   },
+   {
+    "date": "2026-11-12",
+    "time": "11:00",
+    "temp": 14,
+    "rainProbability": 5,
+    "rainMm": null,
+    "humidity": null,
+    "windSpeed": 14
+   },
+   {
+    "date": "2026-11-12",
+    "time": "12:00",
+    "temp": 15,
+    "rainProbability": 5,
+    "rainMm": 0,
+    "windSpeed": 9
+   },
+   {
+    "date": "2026-11-12",
+    "time": "13:00",
+    "temp": 16,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "14:00",
+    "temp": 10,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "15:00",
+    "temp": 11,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "16:00",
+    "temp": 12,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "17:00",
+    "temp": 13,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "18:00",
+    "temp": 14,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "19:00",
+    "temp": 15,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "20:00",
+    "temp": 16,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "21:00",
+    "temp": 10,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "22:00",
+    "temp": 11,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-12",
+    "time": "23:00",
+    "temp": 12,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "00:00",
+    "temp": 11,
+    "rainProbability": 80
+   },
+   {
+    "date": "2026-11-13",
+    "time": "01:00",
+    "temp": 12,
+    "rainProbability": 20
+   },
+   {
+    "date": "2026-11-13",
+    "time": "02:00",
+    "temp": 13,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "03:00",
+    "temp": 14,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "04:00",
+    "temp": 15,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "05:00",
+    "temp": 16,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "06:00",
+    "temp": 17,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "07:00",
+    "temp": 11,
+    "rainProbability": 5,
+    "sky": "Nuboso",
+    "skyCode": "13"
+   },
+   {
+    "date": "2026-11-13",
+    "time": "08:00",
+    "temp": 12,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "09:00",
+    "temp": 13,
+    "feelsLike": 8,
+    "rainProbability": 5,
+    "sky": "Despejado",
+    "skyCode": "11n"
+   },
+   {
+    "date": "2026-11-13",
+    "time": "10:00",
+    "temp": 14,
+    "feelsLike": null,
+    "rainProbability": 5,
+    "rainMm": 0.1,
+    "humidity": 70,
+    "sky": "",
+    "skyCode": "12",
+    "windSpeed": 11
+   },
+   {
+    "date": "2026-11-13",
+    "time": "11:00",
+    "temp": 15,
+    "rainProbability": 5,
+    "rainMm": null,
+    "humidity": null,
+    "windSpeed": 14
+   },
+   {
+    "date": "2026-11-13",
+    "time": "12:00",
+    "temp": 16,
+    "rainProbability": 5,
+    "rainMm": 0,
+    "windSpeed": 9
+   },
+   {
+    "date": "2026-11-13",
+    "time": "13:00",
+    "temp": 17,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "14:00",
+    "temp": 11,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "15:00",
+    "temp": 12,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "16:00",
+    "temp": 13,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "17:00",
+    "temp": 14,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "18:00",
+    "temp": 15,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "19:00",
+    "temp": 16,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "20:00",
+    "temp": 17,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "21:00",
+    "temp": 11,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "22:00",
+    "temp": 12,
+    "rainProbability": 5
+   },
+   {
+    "date": "2026-11-13",
+    "time": "23:00",
+    "temp": 13,
+    "rainProbability": 5
+   }
+  ],
+  "sun": {
+   "2026-11-13": {
+    "rise": "07:48",
+    "set": "18:23"
+   }
+  },
+  "issued": "2026-11-12T08:25:00"
+ },
+ "mismatch": {
+  "rawDaily": [
+   {
+    "id": "08019",
+    "elaborado": "2026-11-12T08:20:00",
+    "origen": {
+     "productor": "Agencia Estatal de Meteorología - AEMET. Gobierno de España"
+    },
+    "prediccion": {
+     "dia": [
+      {
+       "fecha": "2026-11-12T00:00:00",
+       "probPrecipitacion": [
+        {
+         "value": 0,
+         "periodo": "00-24"
+        },
+        {
+         "value": 5,
+         "periodo": "00-12"
+        },
+        {
+         "value": "",
+         "periodo": "12-24"
+        }
+       ],
+       "cotaNieveProv": [
+        {
+         "value": "1200",
+         "periodo": "00-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "12",
+         "periodo": "00-24",
+         "descripcion": "Poco nuboso"
+        },
+        {
+         "periodo": "00-06",
+         "value": "11",
+         "descripcion": "S0"
+        },
+        {
+         "periodo": "06-12",
+         "value": "12",
+         "descripcion": "S1"
+        },
+        {
+         "periodo": "12-18",
+         "value": "13",
+         "descripcion": "S2"
+        },
+        {
+         "periodo": "18-24",
+         "value": "14",
+         "descripcion": "S3"
+        }
+       ],
+       "viento": [
+        {
+         "periodo": "00-24",
+         "direccion": "NE",
+         "velocidad": 12
+        },
+        {
+         "periodo": "00-06",
+         "direccion": "N",
+         "velocidad": [
+          8
+         ]
+        },
+        {
+         "periodo": "06-12",
+         "direccion": "",
+         "velocidad": "10"
+        },
+        {
+         "periodo": "12-18",
+         "direccion": [
+          "SO"
+         ],
+         "velocidad": 15
+        },
+        {
+         "periodo": "18-24",
+         "direccion": "C",
+         "velocidad": 0
+        }
+       ],
+       "rachaMax": [
+        {
+         "value": "30",
+         "periodo": "00-24"
+        },
+        {
+         "value": "25",
+         "periodo": "00-06"
+        },
+        {
+         "value": "",
+         "periodo": "06-12"
+        }
+       ],
+       "temperatura": {
+        "maxima": 20,
+        "minima": "9,5",
+        "dato": []
+       },
+       "sensTermica": {
+        "maxima": 18,
+        "minima": 7
+       },
+       "humedadRelativa": {
+        "maxima": 90,
+        "minima": "Ip"
+       },
+       "uvMax": 5
+      },
+      {
+       "fecha": "2026-11-13T00:00:00",
+       "probPrecipitacion": [
+        {
+         "value": 10,
+         "periodo": "00-24"
+        },
+        {
+         "value": 5,
+         "periodo": "00-12"
+        },
+        {
+         "value": "",
+         "periodo": "12-24"
+        }
+       ],
+       "cotaNieveProv": [
+        {
+         "value": "1200",
+         "periodo": "00-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "12",
+         "periodo": "00-24",
+         "descripcion": "Poco nuboso"
+        },
+        {
+         "periodo": "00-06",
+         "value": "11",
+         "descripcion": "S0"
+        },
+        {
+         "periodo": "06-12",
+         "value": "12",
+         "descripcion": "S1"
+        },
+        {
+         "periodo": "12-18",
+         "value": "13",
+         "descripcion": "S2"
+        },
+        {
+         "periodo": "18-24",
+         "value": "14",
+         "descripcion": "S3"
+        }
+       ],
+       "viento": [
+        {
+         "periodo": "00-24",
+         "direccion": "NE",
+         "velocidad": 12
+        },
+        {
+         "periodo": "00-06",
+         "direccion": "N",
+         "velocidad": [
+          8
+         ]
+        },
+        {
+         "periodo": "06-12",
+         "direccion": "",
+         "velocidad": "10"
+        },
+        {
+         "periodo": "12-18",
+         "direccion": [
+          "SO"
+         ],
+         "velocidad": 15
+        },
+        {
+         "periodo": "18-24",
+         "direccion": "C",
+         "velocidad": 0
+        }
+       ],
+       "rachaMax": [
+        {
+         "value": "30",
+         "periodo": "00-24"
+        },
+        {
+         "value": "25",
+         "periodo": "00-06"
+        },
+        {
+         "value": "",
+         "periodo": "06-12"
+        }
+       ],
+       "temperatura": {
+        "maxima": 21,
+        "minima": "9,5",
+        "dato": []
+       },
+       "sensTermica": {
+        "maxima": 19,
+        "minima": 7
+       },
+       "humedadRelativa": {
+        "maxima": 90,
+        "minima": "Ip"
+       },
+       "uvMax": 5
+      },
+      {
+       "fecha": "2026-11-14T00:00:00",
+       "probPrecipitacion": [
+        {
+         "value": 20,
+         "periodo": "00-24"
+        },
+        {
+         "value": 5,
+         "periodo": "00-12"
+        },
+        {
+         "value": "",
+         "periodo": "12-24"
+        }
+       ],
+       "cotaNieveProv": [
+        {
+         "value": "1200",
+         "periodo": "00-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "12",
+         "periodo": "00-24",
+         "descripcion": "Poco nuboso"
+        },
+        {
+         "periodo": "00-06",
+         "value": "11",
+         "descripcion": "S0"
+        },
+        {
+         "periodo": "06-12",
+         "value": "12",
+         "descripcion": "S1"
+        },
+        {
+         "periodo": "12-18",
+         "value": "13",
+         "descripcion": "S2"
+        },
+        {
+         "periodo": "18-24",
+         "value": "14",
+         "descripcion": "S3"
+        }
+       ],
+       "viento": [
+        {
+         "periodo": "00-24",
+         "direccion": "NE",
+         "velocidad": 12
+        },
+        {
+         "periodo": "00-06",
+         "direccion": "N",
+         "velocidad": [
+          8
+         ]
+        },
+        {
+         "periodo": "06-12",
+         "direccion": "",
+         "velocidad": "10"
+        },
+        {
+         "periodo": "12-18",
+         "direccion": [
+          "SO"
+         ],
+         "velocidad": 15
+        },
+        {
+         "periodo": "18-24",
+         "direccion": "C",
+         "velocidad": 0
+        }
+       ],
+       "rachaMax": [
+        {
+         "value": "30",
+         "periodo": "00-24"
+        },
+        {
+         "value": "25",
+         "periodo": "00-06"
+        },
+        {
+         "value": "",
+         "periodo": "06-12"
+        }
+       ],
+       "temperatura": {
+        "maxima": 22,
+        "minima": "9,5",
+        "dato": []
+       },
+       "sensTermica": {
+        "maxima": 20,
+        "minima": 7
+       },
+       "humedadRelativa": {
+        "maxima": 90,
+        "minima": "Ip"
+       }
+      },
+      {
+       "fecha": "2026-11-15T00:00:00",
+       "probPrecipitacion": [
+        {
+         "value": 30,
+         "periodo": "00-24"
+        },
+        {
+         "value": 5,
+         "periodo": "00-12"
+        },
+        {
+         "value": "",
+         "periodo": "12-24"
+        }
+       ],
+       "cotaNieveProv": [
+        {
+         "value": "1200",
+         "periodo": "00-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "43",
+         "periodo": "00-24",
+         "descripcion": "Nuboso con lluvia escasa"
+        },
+        {
+         "value": "11",
+         "periodo": "00-12",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "15",
+         "periodo": "12-24",
+         "descripcion": "Muy nuboso"
+        }
+       ],
+       "viento": [
+        {
+         "periodo": "00-24",
+         "direccion": "NE",
+         "velocidad": 12
+        },
+        {
+         "periodo": "00-06",
+         "direccion": "N",
+         "velocidad": [
+          8
+         ]
+        },
+        {
+         "periodo": "06-12",
+         "direccion": "",
+         "velocidad": "10"
+        },
+        {
+         "periodo": "12-18",
+         "direccion": [
+          "SO"
+         ],
+         "velocidad": 15
+        },
+        {
+         "periodo": "18-24",
+         "direccion": "C",
+         "velocidad": 0
+        }
+       ],
+       "rachaMax": [
+        {
+         "value": "30",
+         "periodo": "00-24"
+        },
+        {
+         "value": "25",
+         "periodo": "00-06"
+        },
+        {
+         "value": "",
+         "periodo": "06-12"
+        }
+       ],
+       "temperatura": {
+        "maxima": 23,
+        "minima": "9,5",
+        "dato": []
+       },
+       "sensTermica": {
+        "maxima": 21,
+        "minima": 7
+       },
+       "humedadRelativa": {
+        "maxima": 90,
+        "minima": "Ip"
+       }
+      },
+      {
+       "fecha": "2026-11-16T00:00:00",
+       "probPrecipitacion": [
+        {
+         "value": 40,
+         "periodo": "00-24"
+        },
+        {
+         "value": 5,
+         "periodo": "00-12"
+        },
+        {
+         "value": "",
+         "periodo": "12-24"
+        }
+       ],
+       "cotaNieveProv": [
+        {
+         "value": "1200",
+         "periodo": "00-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "43",
+         "periodo": "00-24",
+         "descripcion": "Nuboso con lluvia escasa"
+        },
+        {
+         "value": "11",
+         "periodo": "00-12",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "15",
+         "periodo": "12-24",
+         "descripcion": "Muy nuboso"
+        }
+       ],
+       "viento": [
+        {
+         "periodo": "00-24",
+         "direccion": "NE",
+         "velocidad": 12
+        },
+        {
+         "periodo": "00-06",
+         "direccion": "N",
+         "velocidad": [
+          8
+         ]
+        },
+        {
+         "periodo": "06-12",
+         "direccion": "",
+         "velocidad": "10"
+        },
+        {
+         "periodo": "12-18",
+         "direccion": [
+          "SO"
+         ],
+         "velocidad": 15
+        },
+        {
+         "periodo": "18-24",
+         "direccion": "C",
+         "velocidad": 0
+        }
+       ],
+       "rachaMax": [
+        {
+         "value": "30",
+         "periodo": "00-24"
+        },
+        {
+         "value": "25",
+         "periodo": "00-06"
+        },
+        {
+         "value": "",
+         "periodo": "06-12"
+        }
+       ],
+       "temperatura": {
+        "maxima": 24,
+        "minima": "9,5",
+        "dato": []
+       },
+       "sensTermica": {
+        "maxima": 22,
+        "minima": 7
+       },
+       "humedadRelativa": {
+        "maxima": 90,
+        "minima": "Ip"
+       }
+      },
+      {
+       "fecha": "2026-11-17T00:00:00",
+       "probPrecipitacion": [
+        {
+         "value": 50,
+         "periodo": "00-24"
+        },
+        {
+         "value": 5,
+         "periodo": "00-12"
+        },
+        {
+         "value": "",
+         "periodo": "12-24"
+        }
+       ],
+       "cotaNieveProv": [
+        {
+         "value": "1200",
+         "periodo": "00-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "14",
+         "periodo": "00-24",
+         "descripcion": "Intervalos nubosos"
+        }
+       ],
+       "viento": [
+        {
+         "periodo": "00-24",
+         "direccion": "NE",
+         "velocidad": 12
+        },
+        {
+         "periodo": "00-06",
+         "direccion": "N",
+         "velocidad": [
+          8
+         ]
+        },
+        {
+         "periodo": "06-12",
+         "direccion": "",
+         "velocidad": "10"
+        },
+        {
+         "periodo": "12-18",
+         "direccion": [
+          "SO"
+         ],
+         "velocidad": 15
+        },
+        {
+         "periodo": "18-24",
+         "direccion": "C",
+         "velocidad": 0
+        }
+       ],
+       "rachaMax": [
+        {
+         "value": "30",
+         "periodo": "00-24"
+        },
+        {
+         "value": "25",
+         "periodo": "00-06"
+        },
+        {
+         "value": "",
+         "periodo": "06-12"
+        }
+       ],
+       "temperatura": {
+        "maxima": 25,
+        "minima": "9,5",
+        "dato": []
+       },
+       "sensTermica": {
+        "maxima": 23,
+        "minima": 7
+       },
+       "humedadRelativa": {
+        "maxima": 90,
+        "minima": "Ip"
+       }
+      },
+      {
+       "fecha": "2026-11-18T00:00:00",
+       "probPrecipitacion": [
+        {
+         "value": 60,
+         "periodo": "00-24"
+        },
+        {
+         "value": 5,
+         "periodo": "00-12"
+        },
+        {
+         "value": "",
+         "periodo": "12-24"
+        }
+       ],
+       "cotaNieveProv": [
+        {
+         "value": "1200",
+         "periodo": "00-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "14",
+         "periodo": "00-24",
+         "descripcion": "Intervalos nubosos"
+        }
+       ],
+       "viento": [
+        {
+         "periodo": "00-24",
+         "direccion": "NE",
+         "velocidad": 12
+        },
+        {
+         "periodo": "00-06",
+         "direccion": "N",
+         "velocidad": [
+          8
+         ]
+        },
+        {
+         "periodo": "06-12",
+         "direccion": "",
+         "velocidad": "10"
+        },
+        {
+         "periodo": "12-18",
+         "direccion": [
+          "SO"
+         ],
+         "velocidad": 15
+        },
+        {
+         "periodo": "18-24",
+         "direccion": "C",
+         "velocidad": 0
+        }
+       ],
+       "rachaMax": [
+        {
+         "value": "30",
+         "periodo": "00-24"
+        },
+        {
+         "value": "25",
+         "periodo": "00-06"
+        },
+        {
+         "value": "",
+         "periodo": "06-12"
+        }
+       ],
+       "temperatura": {
+        "maxima": 26,
+        "minima": "9,5",
+        "dato": []
+       },
+       "sensTermica": {
+        "maxima": 24,
+        "minima": 7
+       },
+       "humedadRelativa": {
+        "maxima": 90,
+        "minima": "Ip"
+       }
+      },
+      {
+       "fecha": "bad",
+       "temperatura": {}
+      }
+     ]
+    }
+   }
+  ],
+  "daily": null,
+  "hourly": null
+ }
+}
