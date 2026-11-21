@@ -38,7 +38,7 @@ class ParityWithTheSiteParser(unittest.TestCase):
 
 class Requests(unittest.TestCase):
     def reader(self, calls, answers):
-        def read(url, key):
+        def read(url, key, timeout=None):
             calls.append((url, key))
             return answers[len(calls) - 1]
         return read
@@ -58,11 +58,11 @@ class Requests(unittest.TestCase):
 
     def test_429_in_body_or_status_means_wait(self):
         with self.assertRaises(aemet.Busy):
-            aemet.request('/x', 'K', lambda url, key: {'estado': 429})
+            aemet.request('/x', 'K', lambda url, key, timeout=None: {'estado': 429})
 
     def test_data_url_must_stay_on_aemet(self):
         with self.assertRaises(RuntimeError):
-            aemet.request('/x', 'K', lambda url, key: {'estado': 200, 'datos': 'https://evil.example/opendata/sh/x'})
+            aemet.request('/x', 'K', lambda url, key, timeout=None: {'estado': 200, 'datos': 'https://evil.example/opendata/sh/x'})
 
     def test_numbers_like_json_not_python(self):
         self.assertEqual([aemet.number(v) for v in (21, '9,5', 'Ip', '-', '', None, '1_0', 'x', 3.0)], [21, 9.5, None, None, None, None, None, None, 3])

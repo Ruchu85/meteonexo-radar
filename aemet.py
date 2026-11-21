@@ -13,10 +13,26 @@ import urllib.request
 from urllib.parse import urlparse
 
 ROOT = 'https://opendata.aemet.es/opendata/api'
+# No single request may hold the snapshot job for long: the step has a hard 9-minute limit.
+REQUEST_TIMEOUT = 20
 
 
 class Busy(Exception):
-    """AEMET answered 429: wait before asking again."""
+    """AEMET answered 429: wait before asking again (retry_after: seconds asked by the server, if any)."""
+
+    def __init__(self, retry_after=None):
+        super().__init__('AEMET busy (429)')
+        self.retry_after = retry_after
+
+
+def retry_after_seconds(headers):
+    """Seconds from a Retry-After header given as a number; None when absent or given as a date."""
+    value = (headers or {}).get('Retry-After') if headers is not None else None
+    try:
+        seconds = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    return seconds if seconds >= 0 else None
 
 
 def number(value):
@@ -239,7 +255,7 @@ def parse_hourly(source, requested_id):
     return {'hours': hours, 'sun': sun, 'issued': doc.get('elaborado') or None}
 
 
-def read_json(url, key, timeout=40):
+def read_json(url, key, timeout=REQUEST_TIMEOUT):
     request = urllib.request.Request(url, headers={'api_key': key, 'Accept': 'application/json', 'User-Agent': 'TiempoEn-forecast-snapshot'})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
@@ -248,7 +264,7 @@ def read_json(url, key, timeout=40):
             match = re.search(r'charset=([\w-]+)', response.headers.get('Content-Type') or '', re.I)
     except urllib.error.HTTPError as error:
         if error.code == 429:
-            raise Busy() from None
+            raise Busy(retry_after_seconds(error.headers)) from None
         raise
     try:
         return json.loads(body.decode(match.group(1) if match else 'utf-8'))
@@ -256,8 +272,8 @@ def read_json(url, key, timeout=40):
         return json.loads(body.decode('utf-8'))
 
 
-def request(endpoint, key, read=read_json):
-    first = read(ROOT + endpoint, key)
+def request(endpoint, key, read=read_json, timeout=REQUEST_TIMEOUT):
+    first = read(ROOT + endpoint, key, timeout=timeout)
     if first.get('estado') == 429:
         raise Busy()
     if not first.get('datos') or (first.get('estado') or 0) >= 400:
@@ -265,11 +281,11 @@ def request(endpoint, key, read=read_json):
     url = urlparse(first['datos'])
     if url.scheme != 'https' or url.hostname != 'opendata.aemet.es' or not url.path.startswith('/opendata/'):
         raise RuntimeError('Unexpected AEMET data URL')
-    return read(first['datos'], key)
+    return read(first['datos'], key, timeout=timeout)
 
 
-def forecast(ident, key, read=read_json):
+def forecast(ident, key, read=read_json, timeout=REQUEST_TIMEOUT):
     """Daily and hourly forecast of an INE municipality, in the format of the site's /api/prevision."""
-    daily = parse_daily(request(f'/prediccion/especifica/municipio/diaria/{ident}', key, read), ident)
-    hourly = parse_hourly(request(f'/prediccion/especifica/municipio/horaria/{ident}', key, read), ident)
+    daily = parse_daily(request(f'/prediccion/especifica/municipio/diaria/{ident}', key, read, timeout), ident)
+    hourly = parse_hourly(request(f'/prediccion/especifica/municipio/horaria/{ident}', key, read, timeout), ident)
     return {'ok': bool(daily and daily['days']), 'daily': daily, 'hourly': hourly}
