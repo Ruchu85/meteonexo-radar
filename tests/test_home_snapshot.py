@@ -306,5 +306,80 @@ class MainTest(unittest.TestCase):
         self.assertTrue((folder / 'home-weather.json').exists())
 
 
+class RotationTest(unittest.TestCase):
+    """The run asks first for the cities whose data are oldest, so the cities left behind rotate."""
+
+    def base(self, dates):
+        return {'cities': {slug: entry(when) for slug, when in dates.items()}}
+
+    def test_oldest_data_go_first(self):
+        base = self.base({'a': '2026-11-21T18:00:00Z', 'b': '2026-11-21T16:00:00Z', 'c': '2026-11-21T17:00:00Z'})
+        self.assertEqual(hs.priority_order(['a', 'b', 'c'], base), ['b', 'c', 'a'])
+
+    def test_cities_without_a_valid_date_go_first(self):
+        base = {'cities': {'a': entry('2026-11-21T16:00:00Z'), 'b': entry('not a date'), 'd': {'daily': {'days': [{'date': 'x'}]}}}}
+        self.assertEqual(hs.priority_order(['a', 'b', 'c', 'd'], base), ['b', 'c', 'd', 'a'], 'invalid, missing, without fetchedAt; listing order among them')
+
+    def test_ties_keep_a_deterministic_order(self):
+        same = '2026-11-21T16:00:00Z'
+        base = self.base({'z': same, 'm': same, 'a': same})
+        first = hs.priority_order(['z', 'm', 'a'], base)
+        self.assertEqual(first, ['z', 'm', 'a'], 'listing order')
+        self.assertEqual(hs.priority_order(['z', 'm', 'a'], base), first)
+
+    def test_a_city_just_updated_loses_priority(self):
+        base = self.base({'a': '2026-11-21T16:00:00Z', 'b': '2026-11-21T16:30:00Z', 'c': '2026-11-21T17:00:00Z'})
+        self.assertEqual(hs.priority_order(['a', 'b', 'c'], base)[0], 'a')
+        base['cities']['a'] = entry('2026-11-21T19:00:00Z')
+        self.assertEqual(hs.priority_order(['a', 'b', 'c'], base), ['b', 'c', 'a'])
+
+    def test_the_cities_left_behind_by_the_deadline_go_first_in_the_next_run(self):
+        slugs = [f'city{i:02d}' for i in range(54)]
+        published = self.base({slug: '2026-01-01T00:00:00Z' for slug in slugs})
+
+        def run(order, base):
+            clock, asked = Clock(), []
+
+            def get(url, timeout=None):
+                asked.append(url.split('=')[1])
+                clock.now += 4  # about 9 s per city with the 5 s pause, as in production
+                return answer('new')
+
+            report = {}
+            snapshot = hs.build(order, base, get=get, sleep=clock.sleep, clock=clock, deadline=hs.DEADLINE, report=report)
+            return snapshot, asked, report
+
+        first, asked1, report1 = run(hs.priority_order(slugs, published), published)
+        left_behind = report1['not_asked']
+        self.assertEqual(len(left_behind), 9)
+        self.assertEqual(report1['stopped'], 'deadline')
+        order2 = hs.priority_order(slugs, first)
+        self.assertEqual(order2[:9], left_behind, 'the cities left behind are asked first')
+        second, asked2, report2 = run(order2, first)
+        self.assertEqual(asked2[:9], left_behind)
+        self.assertTrue(set(left_behind).isdisjoint(report2['not_asked']), 'none of them is left behind twice')
+        self.assertTrue(all(slug in asked1 for slug in report2['not_asked']), 'now the most recently updated wait')
+
+    def test_main_rotates_but_still_validates_against_all_cities(self):
+        from unittest import mock
+        folder = Path(tempfile.mkdtemp())
+        previous = {'version': 1, 'generatedAt': '2000-01-01T00:00:00Z', 'cities': {
+            'a': entry('2026-11-21T18:00:00Z'), 'b': entry('2026-11-21T16:00:00Z'), 'c': entry('2026-11-21T17:00:00Z')}}
+        (folder / 'forecasts.json').write_text(json.dumps(previous), encoding='utf8')
+        seen = {}
+
+        def fake_build(order, base, **kw):
+            seen['order'] = list(order)
+            kw['report'].update({'refreshed': ['b'], 'kept': [], 'not_asked': [], 'stopped': None})
+            return {'version': 1, 'generatedAt': '2026-11-21T19:00:00Z', 'source': 'AEMET OpenData',
+                    'cities': {'b': entry('2026-11-21T19:00:00Z'), 'c': entry('2026-11-21T17:00:00Z')}}
+
+        with mock.patch.object(hs, 'get_json', return_value={'cities': ['a'], 'all': ['a', 'b', 'c']}),                 mock.patch.object(hs, 'build', side_effect=fake_build),                 mock.patch.object(sys, 'argv', ['home_snapshot.py', '--output', str(folder)]):
+            code = hs.main()
+        self.assertEqual(seen['order'], ['b', 'c', 'a'])
+        self.assertEqual(code, 1, 'a snapshot missing a city is not published')
+        self.assertEqual(json.loads((folder / 'forecasts.json').read_text(encoding='utf8'))['generatedAt'], '2000-01-01T00:00:00Z')
+
+
 if __name__ == '__main__':
     unittest.main()

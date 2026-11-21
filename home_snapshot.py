@@ -245,6 +245,27 @@ def with_checkpoint(previous, checkpoint):
     return {**previous, 'cities': cities}
 
 
+def fetched_time(entry):
+    """When the forecast of a city was obtained; None when missing or not a valid timestamp."""
+    try:
+        return datetime.strptime((entry or {}).get('fetchedAt') or '', '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def priority_order(slugs, base):
+    """Oldest data first, so a run cut by the deadline never leaves the same cities behind twice.
+    A city without a valid date goes first; ties keep the order of the site's listing (then the slug)."""
+    cities = base.get('cities') or {}
+    position = {slug: index for index, slug in enumerate(slugs)}
+
+    def key(slug):
+        when = fetched_time(cities.get(slug))
+        return (when is not None, when or datetime.min.replace(tzinfo=timezone.utc), position[slug], slug)
+
+    return sorted(dict.fromkeys(slugs), key=key)
+
+
 def main():
     sys.stdout.reconfigure(line_buffering=True)
     parser = argparse.ArgumentParser()
@@ -280,8 +301,10 @@ def main():
         progress['updatedAt'] = now_iso()
         write_json(checkpoint_path, progress)
 
+    order = priority_order(slugs, base)
+    log(f'Order, oldest data first: {", ".join(order[:5])}{" ..." if len(order) > 5 else ""}')
     report = {}
-    forecasts = build(slugs, base, direct=direct, sleep=stop.wait, stop=stop, on_entry=save_checkpoint, report=report)
+    forecasts = build(order, base, direct=direct, sleep=stop.wait, stop=stop, on_entry=save_checkpoint, report=report)
     log(f"Run: {len(report['refreshed'])} refreshed, {len(report['kept'])} kept, {len(report['not_asked'])} not asked"
         f"{', stopped: ' + report['stopped'] if report['stopped'] else ''}")
     if report['stopped'] == 'interrupted':
