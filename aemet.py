@@ -60,6 +60,11 @@ def expired_periods(day):
     return {x.get('periodo') for x in sky if x and not x.get('descripcion') and x.get('value') in (None, '')}
 
 
+def current(items, expired):
+    """The entries of the periods still forecast."""
+    return [x for x in items if (x or {}).get('periodo') not in expired] if isinstance(items, list) else items
+
+
 def max_probability(items, expired=frozenset()):
     if not isinstance(items, list):
         return None
@@ -109,18 +114,20 @@ def day_periods(day, expired=frozenset()):
         else ['00-12', '12-24'] if has_all(['00-12', '12-24']) else []
     result = []
     for ident in ids:
+        # An expired period keeps its row ("Ya transcurrido") but carries no forecast values.
+        gone = ident in expired
         sky = find_period(day.get('estadoCielo'), ident)
-        wind = wind_value(find_period(day.get('viento'), ident))
+        wind = wind_value(None if gone else find_period(day.get('viento'), ident))
         item = {
             'period': ident,
             'sky': (sky or {}).get('descripcion') or '',
             'skyCode': (sky or {}).get('value') or '',
-            'rainProbability': None if ident in expired else number((find_period(day.get('probPrecipitacion'), ident) or {}).get('value')),
+            'rainProbability': None if gone else number((find_period(day.get('probPrecipitacion'), ident) or {}).get('value')),
             'windSpeed': wind['speed'],
             'windDirection': wind['direction'],
-            'gust': number((find_period(day.get('rachaMax'), ident) or {}).get('value')),
+            'gust': None if gone else number((find_period(day.get('rachaMax'), ident) or {}).get('value')),
         }
-        if item['sky'] or item['rainProbability'] is not None or item['windSpeed'] is not None:
+        if item['sky'] or item['rainProbability'] is not None or item['windSpeed'] is not None or gone:
             result.append(item)
     return result
 
@@ -138,7 +145,7 @@ def parse_daily(source, requested_id):
             continue
         sky = best_period(day.get('estadoCielo'))
         expired = expired_periods(day)
-        wind = wind_value(best_period(day.get('viento')))
+        wind = wind_value(best_period(current(day.get('viento'), expired)))
         temp, feels, humidity = (day.get(k) or {} for k in ('temperatura', 'sensTermica', 'humedadRelativa'))
         days.append({
             'date': date,
@@ -155,7 +162,7 @@ def parse_daily(source, requested_id):
             'snow': (best_period(day.get('cotaNieveProv')) or {}).get('value') or None,
             'feelsMax': number(feels.get('maxima')),
             'feelsMin': number(feels.get('minima')),
-            'gust': max_value(day.get('rachaMax')),
+            'gust': max_value(current(day.get('rachaMax'), expired)),
             'periods': day_periods(day, expired),
         })
     origin = doc.get('origen') or {}

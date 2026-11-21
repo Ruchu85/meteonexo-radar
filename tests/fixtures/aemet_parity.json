@@ -2582,6 +2582,11 @@
        ],
        "viento": [
         {
+         "direccion": "",
+         "velocidad": 0,
+         "periodo": "00-24"
+        },
+        {
          "direccion": "SE",
          "velocidad": 5,
          "periodo": "00-06"
@@ -2691,7 +2696,7 @@
      "skyCode": "25",
      "rainProbability": 100,
      "windSpeed": 5,
-     "windDirection": "SE",
+     "windDirection": "E",
      "humidityMin": null,
      "humidityMax": null,
      "uv": null,
@@ -2705,8 +2710,8 @@
        "sky": "",
        "skyCode": "",
        "rainProbability": null,
-       "windSpeed": 5,
-       "windDirection": "SE",
+       "windSpeed": null,
+       "windDirection": null,
        "gust": null
       },
       {
@@ -2880,6 +2885,11 @@
        ],
        "viento": [
         {
+         "direccion": "",
+         "velocidad": 0,
+         "periodo": "00-24"
+        },
+        {
          "direccion": "SE",
          "velocidad": 5,
          "periodo": "00-06"
@@ -2989,7 +2999,7 @@
      "skyCode": "25",
      "rainProbability": 100,
      "windSpeed": 5,
-     "windDirection": "SE",
+     "windDirection": "E",
      "humidityMin": null,
      "humidityMax": null,
      "uv": null,
@@ -3003,8 +3013,8 @@
        "sky": "",
        "skyCode": "",
        "rainProbability": null,
-       "windSpeed": 5,
-       "windDirection": "SE",
+       "windSpeed": null,
+       "windDirection": null,
        "gust": null
       },
       {

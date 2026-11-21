@@ -27,6 +27,9 @@ class ParityWithTheSiteParser(unittest.TestCase):
             self.assertEqual(today['rainProbability'], 100, case)
             self.assertIsNone({p['period']: p['rainProbability'] for p in today['periods']}['00-06'], case)
             self.assertEqual(tomorrow['rainProbability'], 10, case)
+            self.assertEqual((today['windSpeed'], today['windDirection']), (5, 'E'), case)
+            expired = next(p for p in today['periods'] if p['period'] == '00-06')
+            self.assertEqual((expired['windSpeed'], expired['windDirection'], expired['gust']), (None, None, None), case)
 
     def test_foreign_id_is_rejected(self):
         self.assertIsNone(aemet.parse_daily(FIXTURE['mismatch']['rawDaily'], FIXTURE['id']))
