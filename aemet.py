@@ -54,13 +54,20 @@ def best_period(items):
     return None
 
 
-def max_probability(items):
+def expired_periods(day):
+    """Periods of the current day that AEMET emptied when it re-issued the forecast (empty sky, probability 0)."""
+    sky = day.get('estadoCielo') if isinstance(day.get('estadoCielo'), list) else []
+    return {x.get('periodo') for x in sky if x and not x.get('descripcion') and x.get('value') in (None, '')}
+
+
+def max_probability(items, expired=frozenset()):
     if not isinstance(items, list):
         return None
-    for x in items:
+    current = [x for x in items if x.get('periodo') not in expired]
+    for x in current:
         if x.get('periodo') == '00-24' and number(x.get('value')) is not None:
             return number(x['value'])
-    values = [v for v in (number(x.get('value')) for x in items) if v is not None]
+    values = [v for v in (number(x.get('value')) for x in current) if v is not None]
     return max(values) if values else None
 
 
@@ -92,7 +99,7 @@ def find_period(items, ident):
     return next((x for x in items if x.get('periodo') == ident), None)
 
 
-def day_periods(day):
+def day_periods(day, expired=frozenset()):
     sky_items = day.get('estadoCielo') or []
 
     def has_all(ids):
@@ -108,7 +115,7 @@ def day_periods(day):
             'period': ident,
             'sky': (sky or {}).get('descripcion') or '',
             'skyCode': (sky or {}).get('value') or '',
-            'rainProbability': number((find_period(day.get('probPrecipitacion'), ident) or {}).get('value')),
+            'rainProbability': None if ident in expired else number((find_period(day.get('probPrecipitacion'), ident) or {}).get('value')),
             'windSpeed': wind['speed'],
             'windDirection': wind['direction'],
             'gust': number((find_period(day.get('rachaMax'), ident) or {}).get('value')),
@@ -130,6 +137,7 @@ def parse_daily(source, requested_id):
         if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', date):
             continue
         sky = best_period(day.get('estadoCielo'))
+        expired = expired_periods(day)
         wind = wind_value(best_period(day.get('viento')))
         temp, feels, humidity = (day.get(k) or {} for k in ('temperatura', 'sensTermica', 'humedadRelativa'))
         days.append({
@@ -138,7 +146,7 @@ def parse_daily(source, requested_id):
             'min': number(temp.get('minima')),
             'sky': (sky or {}).get('descripcion') or '',
             'skyCode': (sky or {}).get('value') or '',
-            'rainProbability': max_probability(day.get('probPrecipitacion')),
+            'rainProbability': max_probability(day.get('probPrecipitacion'), expired),
             'windSpeed': wind['speed'],
             'windDirection': wind['direction'],
             'humidityMin': number(humidity.get('minima')),
@@ -148,7 +156,7 @@ def parse_daily(source, requested_id):
             'feelsMax': number(feels.get('maxima')),
             'feelsMin': number(feels.get('minima')),
             'gust': max_value(day.get('rachaMax')),
-            'periods': day_periods(day),
+            'periods': day_periods(day, expired),
         })
     origin = doc.get('origen') or {}
     return {'days': days, 'issued': doc.get('elaborado') or None, 'source': origin.get('productor') or 'AEMET'}

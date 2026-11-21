@@ -2496,5 +2496,604 @@
   ],
   "daily": null,
   "hourly": null
+ },
+ "reissued": {
+  "raw": [
+   {
+    "id": "28079",
+    "elaborado": "2026-11-21T14:33:08",
+    "origen": {
+     "productor": "AEMET"
+    },
+    "prediccion": {
+     "dia": [
+      {
+       "fecha": "2026-11-21T00:00:00",
+       "temperatura": {
+        "maxima": 14,
+        "minima": 10
+       },
+       "probPrecipitacion": [
+        {
+         "value": 0,
+         "periodo": "00-24"
+        },
+        {
+         "value": 0,
+         "periodo": "00-12"
+        },
+        {
+         "value": 100,
+         "periodo": "12-24"
+        },
+        {
+         "value": 0,
+         "periodo": "00-06"
+        },
+        {
+         "value": 100,
+         "periodo": "06-12"
+        },
+        {
+         "value": 10,
+         "periodo": "12-18"
+        },
+        {
+         "value": 100,
+         "periodo": "18-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "",
+         "periodo": "00-24",
+         "descripcion": ""
+        },
+        {
+         "value": "",
+         "periodo": "00-12",
+         "descripcion": ""
+        },
+        {
+         "value": "25",
+         "periodo": "12-24",
+         "descripcion": "Muy nuboso con lluvia"
+        },
+        {
+         "value": "",
+         "periodo": "00-06",
+         "descripcion": ""
+        },
+        {
+         "value": "25",
+         "periodo": "06-12",
+         "descripcion": "Muy nuboso con lluvia"
+        },
+        {
+         "value": "15",
+         "periodo": "12-18",
+         "descripcion": "Muy nuboso"
+        },
+        {
+         "value": "45n",
+         "periodo": "18-24",
+         "descripcion": "Muy nuboso con lluvia escasa"
+        }
+       ],
+       "viento": [
+        {
+         "direccion": "SE",
+         "velocidad": 5,
+         "periodo": "00-06"
+        },
+        {
+         "direccion": "E",
+         "velocidad": 5,
+         "periodo": "06-12"
+        },
+        {
+         "direccion": "NE",
+         "velocidad": 5,
+         "periodo": "12-18"
+        },
+        {
+         "direccion": "SO",
+         "velocidad": 15,
+         "periodo": "18-24"
+        }
+       ]
+      },
+      {
+       "fecha": "2026-11-22T00:00:00",
+       "temperatura": {
+        "maxima": 14,
+        "minima": 7
+       },
+       "probPrecipitacion": [
+        {
+         "value": 10,
+         "periodo": "00-24"
+        },
+        {
+         "value": 10,
+         "periodo": "00-12"
+        },
+        {
+         "value": 0,
+         "periodo": "12-24"
+        },
+        {
+         "value": 10,
+         "periodo": "00-06"
+        },
+        {
+         "value": 0,
+         "periodo": "06-12"
+        },
+        {
+         "value": 0,
+         "periodo": "12-18"
+        },
+        {
+         "value": 0,
+         "periodo": "18-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "13",
+         "periodo": "00-24",
+         "descripcion": "Intervalos nubosos"
+        },
+        {
+         "value": "13",
+         "periodo": "00-12",
+         "descripcion": "Intervalos nubosos"
+        },
+        {
+         "value": "11",
+         "periodo": "12-24",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "12",
+         "periodo": "00-06",
+         "descripcion": "Nuboso"
+        },
+        {
+         "value": "11",
+         "periodo": "06-12",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "11",
+         "periodo": "12-18",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "11",
+         "periodo": "18-24",
+         "descripcion": "Despejado"
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ],
+  "daily": {
+   "days": [
+    {
+     "date": "2026-11-21",
+     "max": 14,
+     "min": 10,
+     "sky": "Muy nuboso con lluvia",
+     "skyCode": "25",
+     "rainProbability": 100,
+     "windSpeed": 5,
+     "windDirection": "SE",
+     "humidityMin": null,
+     "humidityMax": null,
+     "uv": null,
+     "snow": null,
+     "feelsMax": null,
+     "feelsMin": null,
+     "gust": null,
+     "periods": [
+      {
+       "period": "00-06",
+       "sky": "",
+       "skyCode": "",
+       "rainProbability": null,
+       "windSpeed": 5,
+       "windDirection": "SE",
+       "gust": null
+      },
+      {
+       "period": "06-12",
+       "sky": "Muy nuboso con lluvia",
+       "skyCode": "25",
+       "rainProbability": 100,
+       "windSpeed": 5,
+       "windDirection": "E",
+       "gust": null
+      },
+      {
+       "period": "12-18",
+       "sky": "Muy nuboso",
+       "skyCode": "15",
+       "rainProbability": 10,
+       "windSpeed": 5,
+       "windDirection": "NE",
+       "gust": null
+      },
+      {
+       "period": "18-24",
+       "sky": "Muy nuboso con lluvia escasa",
+       "skyCode": "45n",
+       "rainProbability": 100,
+       "windSpeed": 15,
+       "windDirection": "SO",
+       "gust": null
+      }
+     ]
+    },
+    {
+     "date": "2026-11-22",
+     "max": 14,
+     "min": 7,
+     "sky": "Intervalos nubosos",
+     "skyCode": "13",
+     "rainProbability": 10,
+     "windSpeed": null,
+     "windDirection": null,
+     "humidityMin": null,
+     "humidityMax": null,
+     "uv": null,
+     "snow": null,
+     "feelsMax": null,
+     "feelsMin": null,
+     "gust": null,
+     "periods": [
+      {
+       "period": "00-06",
+       "sky": "Nuboso",
+       "skyCode": "12",
+       "rainProbability": 10,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      },
+      {
+       "period": "06-12",
+       "sky": "Despejado",
+       "skyCode": "11",
+       "rainProbability": 0,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      },
+      {
+       "period": "12-18",
+       "sky": "Despejado",
+       "skyCode": "11",
+       "rainProbability": 0,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      },
+      {
+       "period": "18-24",
+       "sky": "Despejado",
+       "skyCode": "11",
+       "rainProbability": 0,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      }
+     ]
+    }
+   ],
+   "issued": "2026-11-21T14:33:08",
+   "source": "AEMET"
+  }
+ },
+ "reissuedNoCode": {
+  "raw": [
+   {
+    "id": "28079",
+    "elaborado": "2026-11-21T14:33:08",
+    "origen": {
+     "productor": "AEMET"
+    },
+    "prediccion": {
+     "dia": [
+      {
+       "fecha": "2026-11-21T00:00:00",
+       "temperatura": {
+        "maxima": 14,
+        "minima": 10
+       },
+       "probPrecipitacion": [
+        {
+         "value": 0,
+         "periodo": "00-24"
+        },
+        {
+         "value": 0,
+         "periodo": "00-12"
+        },
+        {
+         "value": 100,
+         "periodo": "12-24"
+        },
+        {
+         "value": 0,
+         "periodo": "00-06"
+        },
+        {
+         "value": 100,
+         "periodo": "06-12"
+        },
+        {
+         "value": 10,
+         "periodo": "12-18"
+        },
+        {
+         "value": 100,
+         "periodo": "18-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "periodo": "00-24",
+         "descripcion": ""
+        },
+        {
+         "periodo": "00-12",
+         "descripcion": ""
+        },
+        {
+         "value": "25",
+         "periodo": "12-24",
+         "descripcion": "Muy nuboso con lluvia"
+        },
+        {
+         "periodo": "00-06",
+         "descripcion": ""
+        },
+        {
+         "value": "25",
+         "periodo": "06-12",
+         "descripcion": "Muy nuboso con lluvia"
+        },
+        {
+         "value": "15",
+         "periodo": "12-18",
+         "descripcion": "Muy nuboso"
+        },
+        {
+         "value": "45n",
+         "periodo": "18-24",
+         "descripcion": "Muy nuboso con lluvia escasa"
+        }
+       ],
+       "viento": [
+        {
+         "direccion": "SE",
+         "velocidad": 5,
+         "periodo": "00-06"
+        },
+        {
+         "direccion": "E",
+         "velocidad": 5,
+         "periodo": "06-12"
+        },
+        {
+         "direccion": "NE",
+         "velocidad": 5,
+         "periodo": "12-18"
+        },
+        {
+         "direccion": "SO",
+         "velocidad": 15,
+         "periodo": "18-24"
+        }
+       ]
+      },
+      {
+       "fecha": "2026-11-22T00:00:00",
+       "temperatura": {
+        "maxima": 14,
+        "minima": 7
+       },
+       "probPrecipitacion": [
+        {
+         "value": 10,
+         "periodo": "00-24"
+        },
+        {
+         "value": 10,
+         "periodo": "00-12"
+        },
+        {
+         "value": 0,
+         "periodo": "12-24"
+        },
+        {
+         "value": 10,
+         "periodo": "00-06"
+        },
+        {
+         "value": 0,
+         "periodo": "06-12"
+        },
+        {
+         "value": 0,
+         "periodo": "12-18"
+        },
+        {
+         "value": 0,
+         "periodo": "18-24"
+        }
+       ],
+       "estadoCielo": [
+        {
+         "value": "13",
+         "periodo": "00-24",
+         "descripcion": "Intervalos nubosos"
+        },
+        {
+         "value": "13",
+         "periodo": "00-12",
+         "descripcion": "Intervalos nubosos"
+        },
+        {
+         "value": "11",
+         "periodo": "12-24",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "12",
+         "periodo": "00-06",
+         "descripcion": "Nuboso"
+        },
+        {
+         "value": "11",
+         "periodo": "06-12",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "11",
+         "periodo": "12-18",
+         "descripcion": "Despejado"
+        },
+        {
+         "value": "11",
+         "periodo": "18-24",
+         "descripcion": "Despejado"
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ],
+  "daily": {
+   "days": [
+    {
+     "date": "2026-11-21",
+     "max": 14,
+     "min": 10,
+     "sky": "Muy nuboso con lluvia",
+     "skyCode": "25",
+     "rainProbability": 100,
+     "windSpeed": 5,
+     "windDirection": "SE",
+     "humidityMin": null,
+     "humidityMax": null,
+     "uv": null,
+     "snow": null,
+     "feelsMax": null,
+     "feelsMin": null,
+     "gust": null,
+     "periods": [
+      {
+       "period": "00-06",
+       "sky": "",
+       "skyCode": "",
+       "rainProbability": null,
+       "windSpeed": 5,
+       "windDirection": "SE",
+       "gust": null
+      },
+      {
+       "period": "06-12",
+       "sky": "Muy nuboso con lluvia",
+       "skyCode": "25",
+       "rainProbability": 100,
+       "windSpeed": 5,
+       "windDirection": "E",
+       "gust": null
+      },
+      {
+       "period": "12-18",
+       "sky": "Muy nuboso",
+       "skyCode": "15",
+       "rainProbability": 10,
+       "windSpeed": 5,
+       "windDirection": "NE",
+       "gust": null
+      },
+      {
+       "period": "18-24",
+       "sky": "Muy nuboso con lluvia escasa",
+       "skyCode": "45n",
+       "rainProbability": 100,
+       "windSpeed": 15,
+       "windDirection": "SO",
+       "gust": null
+      }
+     ]
+    },
+    {
+     "date": "2026-11-22",
+     "max": 14,
+     "min": 7,
+     "sky": "Intervalos nubosos",
+     "skyCode": "13",
+     "rainProbability": 10,
+     "windSpeed": null,
+     "windDirection": null,
+     "humidityMin": null,
+     "humidityMax": null,
+     "uv": null,
+     "snow": null,
+     "feelsMax": null,
+     "feelsMin": null,
+     "gust": null,
+     "periods": [
+      {
+       "period": "00-06",
+       "sky": "Nuboso",
+       "skyCode": "12",
+       "rainProbability": 10,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      },
+      {
+       "period": "06-12",
+       "sky": "Despejado",
+       "skyCode": "11",
+       "rainProbability": 0,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      },
+      {
+       "period": "12-18",
+       "sky": "Despejado",
+       "skyCode": "11",
+       "rainProbability": 0,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      },
+      {
+       "period": "18-24",
+       "sky": "Despejado",
+       "skyCode": "11",
+       "rainProbability": 0,
+       "windSpeed": null,
+       "windDirection": null,
+       "gust": null
+      }
+     ]
+    }
+   ],
+   "issued": "2026-11-21T14:33:08",
+   "source": "AEMET"
+  }
  }
 }

@@ -18,6 +18,16 @@ class ParityWithTheSiteParser(unittest.TestCase):
     def test_hourly(self):
         self.assertEqual(aemet.parse_hourly(FIXTURE['rawHourly'], FIXTURE['id']), FIXTURE['hourly'])
 
+    def test_reissued_forecast_expired_periods_are_not_a_0_percent(self):
+        # Madrid, 21/11/2026 14:33: today's expired periods come with an empty sky and probability 0.
+        for case in ('reissued', 'reissuedNoCode'):
+            daily = aemet.parse_daily(FIXTURE[case]['raw'], FIXTURE['id'])
+            self.assertEqual(daily, FIXTURE[case]['daily'], case)
+            today, tomorrow = daily['days'][0], daily['days'][1]
+            self.assertEqual(today['rainProbability'], 100, case)
+            self.assertIsNone({p['period']: p['rainProbability'] for p in today['periods']}['00-06'], case)
+            self.assertEqual(tomorrow['rainProbability'], 10, case)
+
     def test_foreign_id_is_rejected(self):
         self.assertIsNone(aemet.parse_daily(FIXTURE['mismatch']['rawDaily'], FIXTURE['id']))
         self.assertIsNone(aemet.parse_daily({'foo': 2}, None))
