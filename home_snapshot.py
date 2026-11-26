@@ -41,6 +41,10 @@ DEADLINE = 7 * 60
 REQUEST_TIMEOUT = aemet.REQUEST_TIMEOUT
 DAY_KEYS = ('date', 'max', 'min', 'sky', 'skyCode', 'rainProbability')
 CHECKPOINT = 'forecasts.checkpoint.json'
+# Hourly files of every municipality (municipios.py). When recent, the snapshot is built from them with
+# no AEMET request at all; the per-city requests below are only the fallback.
+MUNICIPALITY_FILES = 'municipios'
+FILES_MAX_AGE = timedelta(minutes=90)
 
 
 def log(message):
@@ -266,6 +270,28 @@ def priority_order(slugs, base):
     return sorted(dict.fromkeys(slugs), key=key)
 
 
+def from_municipality_files(folder, slugs, ids, base, now):
+    """(snapshot, refreshed) from the municipality files, or None when they are older than FILES_MAX_AGE
+    or do not cover every city. A city keeps its current entry when that entry is newer than the file."""
+    index = load_json(folder / MUNICIPALITY_FILES / 'index.json')
+    try:
+        generated = datetime.strptime(index['generatedAt'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    except (KeyError, TypeError, ValueError):
+        return None
+    if now - generated > FILES_MAX_AGE:
+        return None
+    cities = {slug: entry for slug, entry in (base.get('cities') or {}).items() if slug in slugs}
+    refreshed = []
+    for slug in slugs:
+        entry = load_json(folder / MUNICIPALITY_FILES / f'{ids.get(slug)}.json') if ids.get(slug) else {}
+        if not ((entry.get('daily') or {}).get('days')) or not entry.get('fetchedAt'):
+            return None
+        if entry['fetchedAt'] >= (cities.get(slug) or {}).get('fetchedAt', ''):
+            cities[slug] = {'daily': entry['daily'], 'hourly': entry.get('hourly'), 'fetchedAt': entry['fetchedAt']}
+            refreshed.append(slug)
+    return {'version': 1, 'generatedAt': now_iso(), 'source': 'AEMET OpenData', 'cities': cities}, refreshed
+
+
 def main():
     sys.stdout.reconfigure(line_buffering=True)
     parser = argparse.ArgumentParser()
@@ -291,6 +317,21 @@ def main():
     direct = None
     key = os.environ.get('AEMET_API_KEY', '').strip()
     ids = listing.get('ids') or {}
+    from_files = from_municipality_files(folder, slugs, ids, base, datetime.now(timezone.utc))
+    if from_files:
+        forecasts, refreshed = from_files
+        log(f'From the municipality files (no AEMET request): {len(refreshed)} of {len(slugs)} cities newer than published')
+        if not refreshed:
+            log('Nothing newer; the last valid snapshot stays')
+            return 0
+        if publish(folder, forecasts, home_view(forecasts, listing['cities']), slugs, previous):
+            if checkpoint_path.exists():
+                checkpoint_path.unlink()
+            log(f"Snapshot ready: {len(forecasts['cities'])}/{len(slugs)} cities")
+            return 0
+        log('Falling back to asking city by city')
+    else:
+        log('No recent municipality files for every city; asking city by city')
     if key and ids:
         log('Asking AEMET directly (key from the repository secret)')
         direct = lambda slug, timeout: aemet.forecast(ids[slug], key, timeout=timeout) if slug in ids else None

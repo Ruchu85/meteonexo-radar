@@ -381,5 +381,58 @@ class RotationTest(unittest.TestCase):
         self.assertEqual(json.loads((folder / 'forecasts.json').read_text(encoding='utf8'))['generatedAt'], '2000-01-01T00:00:00Z')
 
 
+class FromMunicipalityFilesTest(unittest.TestCase):
+    """With recent hourly municipality files the snapshot needs no AEMET request; otherwise the old way."""
+
+    LISTING = {'cities': ['a'], 'all': ['a', 'b'], 'ids': {'a': '00001', 'b': '00002'}}
+
+    def folder(self, files_age_minutes=10, published=('2026-11-26T08:00:00Z', '2026-11-26T08:00:00Z'), file_time='2026-11-26T10:00:00Z', missing=()):
+        folder = Path(tempfile.mkdtemp())
+        previous = {'version': 1, 'generatedAt': '2000-01-01T00:00:00Z', 'cities': {'a': entry(published[0]), 'b': entry(published[1])}}
+        (folder / 'forecasts.json').write_text(json.dumps(previous), encoding='utf8')
+        files = folder / hs.MUNICIPALITY_FILES
+        files.mkdir()
+        generated = (datetime.now(timezone.utc) - timedelta(minutes=files_age_minutes)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        (files / 'index.json').write_text(json.dumps({'generatedAt': generated, 'count': 2}), encoding='utf8')
+        for code in ('00001', '00002'):
+            if code not in missing:
+                (files / f'{code}.json').write_text(json.dumps(entry(file_time, 'from-file')), encoding='utf8')
+        return folder
+
+    def run_main(self, folder):
+        from unittest import mock
+        calls = []
+
+        def fake_build(order, base, **kw):
+            calls.append(list(order))
+            kw['report'].update({'refreshed': [], 'kept': [], 'not_asked': [], 'stopped': None})
+            return {'version': 1, 'generatedAt': 'x', 'cities': base.get('cities', {})}
+
+        with mock.patch.object(hs, 'get_json', return_value=self.LISTING), mock.patch.object(hs, 'build', side_effect=fake_build),                 mock.patch.object(sys, 'argv', ['home_snapshot.py', '--output', str(folder)]):
+            code = hs.main()
+        return code, calls, json.loads((folder / 'forecasts.json').read_text(encoding='utf8'))
+
+    def test_recent_files_give_the_snapshot_without_asking_aemet(self):
+        code, calls, published = self.run_main(self.folder())
+        self.assertEqual((code, calls), (0, []), 'no city-by-city request')
+        self.assertEqual({c['fetchedAt'] for c in published['cities'].values()}, {'2026-11-26T10:00:00Z'})
+        self.assertEqual(published['cities']['a']['daily']['days'][0]['date'], 'from-file')
+
+    def test_a_missing_file_falls_back_to_asking_city_by_city(self):
+        code, calls, published = self.run_main(self.folder(missing=('00002',)))
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(published['generatedAt'], '2000-01-01T00:00:00Z')
+
+    def test_old_files_fall_back_to_asking_city_by_city(self):
+        _, calls, _ = self.run_main(self.folder(files_age_minutes=200))
+        self.assertEqual(len(calls), 1)
+
+    def test_a_published_entry_newer_than_the_file_is_kept(self):
+        code, calls, published = self.run_main(self.folder(published=('2026-11-26T11:00:00Z', '2026-11-26T08:00:00Z')))
+        self.assertEqual((code, calls), (0, []))
+        self.assertEqual(published['cities']['a']['fetchedAt'], '2026-11-26T11:00:00Z')
+        self.assertEqual(published['cities']['b']['fetchedAt'], '2026-11-26T10:00:00Z')
+
+
 if __name__ == '__main__':
     unittest.main()
