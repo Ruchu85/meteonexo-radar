@@ -48,6 +48,15 @@ jobs:
         continue-on-error: true
         timeout-minutes: 9
         run: python model.py
+      # Forecast of every municipality from AEMET's two "todos" bundles: 2 requests, at most once an hour.
+      # The site reads these files instead of calling AEMET for each visit. Never blocks the radar publication.
+      - name: Prevision de todos los municipios
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        timeout-minutes: 4
+        env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+        run: python municipios.py
       # Forecasts of the indexable TiempoEn cities and of the home map, about every 30 minutes
       # (54 cities, one every 5 s so that AEMET does not answer 429). Never blocks the radar publication.
       # It runs even when the OPERA step failed: the site must not lose its forecasts because the radar source is down.

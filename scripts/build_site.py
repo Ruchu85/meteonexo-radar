@@ -17,6 +17,9 @@ for name in {Path(frame[key]).name for frame in manifest['frames'] for key in ('
 for name in ('manifest.json', 'health.json', 'home-weather.json', 'forecasts.json'):
     if (data / name).exists():
         shutil.copy2(data / name, site / name)
+# Forecast of every municipality (municipios.py): one small file each, read by the site instead of AEMET.
+if (data / 'municipios' / 'index.json').exists():
+    shutil.copytree(data / 'municipios', site / 'municipios', dirs_exist_ok=True)
 # ICON-EU forecast: manifest plus only the images it references.
 model_manifest = data / 'model' / 'manifest.json'
 if model_manifest.exists():
