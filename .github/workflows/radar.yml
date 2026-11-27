@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 25
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy_retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -79,8 +79,17 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
+      # deploy-pages looks the artifact up a few seconds after the upload and GitHub sometimes does not list
+      # it yet ("No artifacts named github-pages were found"): about 1 run in 9. One retry after 30 s.
       - id: deploy
         if: ${{ !cancelled() }}
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - name: Esperar antes de reintentar la publicacion
+        if: ${{ !cancelled() && steps.deploy.outcome == 'failure' }}
+        run: sleep 30
+      - id: deploy_retry
+        if: ${{ !cancelled() && steps.deploy.outcome == 'failure' }}
         uses: actions/deploy-pages@v4
   # Primary trigger. GitHub scheduled workflows are unreliable on young repos (the first
   # cron never fired in 80 minutes), so every run schedules the next one itself.
